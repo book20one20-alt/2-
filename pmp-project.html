@@ -1,0 +1,3179 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ملف مشروع زواج عبدالله - PMP Style</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+            scroll-behavior: smooth;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .section-title {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 1.5rem;
+        }
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            right: 0;
+            width: 60px;
+            height: 3px;
+            background-color: #059669;
+            border-radius: 2px;
+        }
+        .wbs-node {
+            transition: all 0.3s ease;
+        }
+        .wbs-node:hover {
+            transform: translateX(-5px);
+            background-color: #f0fdf4;
+        }
+        .gantt-bar {
+            height: 24px;
+            border-radius: 4px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            color: white;
+            font-weight: bold;
+            transition: width 1s ease-in-out;
+        }
+        .critical-path-node {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            border: 3px solid #059669;
+            background: white;
+            color: #059669;
+            position: relative;
+            z-index: 10;
+        }
+        .critical-path-line {
+            flex-grow: 1;
+            height: 3px;
+            background-color: #059669;
+            position: relative;
+        }
+        .critical-path-line::after {
+            content: '▶';
+            position: absolute;
+            left: -5px;
+            top: -9px;
+            color: #059669;
+            font-size: 12px;
+        }
+
+        /* WBS Advanced Styles */
+        .wbs-gantt-container {
+            overflow-x: auto;
+            padding: 1rem;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 0.75rem;
+            margin: 1rem 0;
+        }
+
+        .gantt-timeline {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            min-width: 600px;
+        }
+
+        .gantt-label {
+            width: 200px;
+            min-width: 200px;
+            font-weight: bold;
+            font-size: 0.875rem;
+            padding-right: 1rem;
+            text-align: right;
+        }
+
+        .gantt-bar-container {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.5);
+            height: 40px;
+            border-radius: 0.5rem;
+            position: relative;
+            margin-left: 1rem;
+        }
+
+        .gantt-bar {
+            height: 100%;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.75rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .gantt-bar:hover {
+            transform: scaleY(1.2);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .gantt-bar-pending { background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); }
+        .gantt-bar-in-progress { background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%); }
+        .gantt-bar-completed { background: linear-gradient(135deg, #34d399 0%, #10b981 100%); }
+
+        .wbs-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .wbs-stat-card {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #059669;
+            transition: all 0.3s ease;
+        }
+
+        .wbs-stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .wbs-stat-value {
+            font-size: 1.875rem;
+            font-weight: bold;
+            color: #059669;
+            margin: 0.5rem 0;
+        }
+
+        .wbs-stat-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .wbs-stat-subtitle {
+            font-size: 0.75rem;
+            color: #9ca3af;
+            margin-top: 0.5rem;
+        }
+
+        .wbs-budget-chart {
+            max-width: 500px;
+            margin: 1rem auto;
+        }
+
+        .wbs-timeline-chart {
+            max-width: 600px;
+            margin: 1rem auto;
+        }
+
+        .wbs-critical-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ef4444;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .wbs-performance-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: bold;
+            margin: 0.5rem 0.25rem;
+        }
+
+        .badge-excellent { background: #d1fae5; color: #065f46; }
+        .badge-good { background: #bfdbfe; color: #1e40af; }
+        .badge-warning { background: #fed7aa; color: #92400e; }
+        .badge-critical { background: #fee2e2; color: #7f1d1d; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            transform: translateY(-50px) scale(0.9);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        .modal-overlay.active .modal-content {
+            transform: translateY(0) scale(1);
+        }
+        .stakeholder-card, .planning-card, .estimation-card, .wbs-card, .rtm-card, .risk-card {
+            transition: all 0.3s ease;
+        }
+        .stakeholder-card:hover, .planning-card:hover, .estimation-card:hover, .wbs-card:hover, .rtm-card:hover, .risk-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .power-interest-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 2px;
+            background: #e5e7eb;
+            border: 2px solid #6b7280;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .power-interest-cell {
+            padding: 1rem;
+            text-align: center;
+            font-size: 0.75rem;
+        }
+        .power-interest-cell.high-high {
+            background: #fecaca;
+        }
+        .power-interest-cell.high-low {
+            background: #fed7aa;
+        }
+        .power-interest-cell.low-high {
+            background: #fef3c7;
+        }
+        .power-interest-cell.low-low {
+            background: #d1fae5;
+        }
+        .editable-item {
+            transition: all 0.3s ease;
+        }
+        .editable-item:hover {
+            background-color: #f9fafb;
+        }
+        .edit-btn, .delete-btn, .add-btn {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .editable-item:hover .edit-btn,
+        .editable-item:hover .delete-btn,
+        .editable-item:hover .add-btn {
+            opacity: 1;
+        }
+        .form-input {
+            transition: all 0.3s ease;
+        }
+        .form-input:focus {
+            border-color: #059669;
+            box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+        }
+        .tab-btn {
+            transition: all 0.3s ease;
+        }
+        .tab-btn.active {
+            background-color: #059669;
+            color: white;
+        }
+        .wbs-tree-node {
+            border-right: 2px solid #059669;
+            padding-right: 1rem;
+            margin-right: 1rem;
+            position: relative;
+        }
+        .wbs-tree-node::before {
+            content: '└─';
+            color: #059669;
+            font-weight: bold;
+            margin-left: 0.5rem;
+        }
+        .wbs-tree-item {
+            transition: all 0.3s ease;
+        }
+        .wbs-tree-item:hover {
+            background-color: #f0fdf4;
+        }
+        .gantt-chart-container {
+            position: relative;
+            padding: 20px 0;
+        }
+        .gantt-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .gantt-label {
+            width: 150px;
+            font-size: 0.875rem;
+            color: #374151;
+            font-weight: 600;
+        }
+        .gantt-timeline {
+            flex: 1;
+            background: #f3f4f6;
+            border-radius: 8px;
+            height: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+        .gantt-bar-custom {
+            height: 24px;
+            border-radius: 6px;
+            position: absolute;
+            top: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            color: white;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .gantt-bar-custom:hover {
+            transform: scaleY(1.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .gantt-day-marker {
+            position: absolute;
+            bottom: 0;
+            font-size: 0.65rem;
+            color: #9ca3af;
+            transform: translateX(-50%);
+        }
+        .pert-calculator {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .estimation-type-card {
+            transition: all 0.3s ease;
+        }
+        .estimation-type-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        /* Navigation Active State */
+        .nav-link {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, #d1fae5);
+            border-radius: 0.5rem;
+            z-index: -1;
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover::before,
+        .nav-link.active::before {
+            width: 100%;
+        }
+        .nav-link.active {
+            color: #059669;
+            font-weight: 700;
+        }
+        .nav-link.active::after {
+            content: '●';
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #059669;
+            font-size: 0.5rem;
+        }
+        /* Section Highlight Animation */
+        @keyframes sectionHighlight {
+            0% { box-shadow: 0 0 0 0 rgba(5, 150, 105, 0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(5, 150, 105, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(5, 150, 105, 0); }
+        }
+        .section-highlight {
+            animation: sectionHighlight 1s ease-out;
+        }
+        /* Mobile Navigation */
+        .mobile-nav-toggle {
+            display: none;
+        }
+        @media (max-width: 1024px) {
+            .mobile-nav-toggle {
+                display: block;
+            }
+            .sidebar-nav {
+                position: fixed;
+                top: 0;
+                right: -300px;
+                width: 280px;
+                height: 100vh;
+                background: white;
+                z-index: 999;
+                transition: right 0.3s ease;
+                overflow-y: auto;
+            }
+            .sidebar-nav.open {
+                right: 0;
+            }
+        }
+        /* Risk Matrix Styles */
+        .risk-matrix {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            grid-template-rows: repeat(5, 1fr);
+            gap: 2px;
+            background: #e5e7eb;
+            border: 2px solid #6b7280;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .risk-matrix-cell {
+            padding: 0.5rem;
+            text-align: center;
+            font-size: 0.7rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 60px;
+        }
+        .risk-matrix-cell.critical {
+            background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+            color: white;
+        }
+        .risk-matrix-cell.high {
+            background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
+            color: white;
+        }
+        .risk-matrix-cell.medium {
+            background: linear-gradient(135deg, #eab308 0%, #facc15 100%);
+            color: white;
+        }
+        .risk-matrix-cell.low {
+            background: linear-gradient(135deg, #22c55e 0%, #4ade80 100%);
+            color: white;
+        }
+        .risk-matrix-cell.very-low {
+            background: linear-gradient(135deg, #86efac 0%, #a7f3d0 100%);
+            color: #065f46;
+        }
+        .risk-card {
+            transition: all 0.3s ease;
+        }
+        .risk-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .risk-level-critical {
+            border-right: 4px solid #dc2626;
+        }
+        .risk-level-high {
+            border-right: 4px solid #f97316;
+        }
+        .risk-level-medium {
+            border-right: 4px solid #eab308;
+        }
+        .risk-level-low {
+            border-right: 4px solid #22c55e;
+        }
+        .filter-btn {
+            transition: all 0.3s ease;
+        }
+        .filter-btn.active {
+            background-color: #059669;
+            color: white;
+        }
+        .search-input {
+            transition: all 0.3s ease;
+        }
+        .search-input:focus {
+            box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.2);
+        }
+        /* Stats Card */
+        .stats-card {
+            transition: all 0.3s ease;
+        }
+        .stats-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        /* Risk Badge */
+        .risk-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .risk-badge-critical {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+        .risk-badge-high {
+            background: #fff7ed;
+            color: #f97316;
+            border: 1px solid #fed7aa;
+        }
+        .risk-badge-medium {
+            background: #fefce8;
+            color: #eab308;
+            border: 1px solid #fef08a;
+        }
+        .risk-badge-low {
+            background: #f0fdf4;
+            color: #22c55e;
+            border: 1px solid #bbf7d0;
+        }
+        /* Probability/Impact Scale */
+        .scale-container {
+            display: flex;
+            gap: 4px;
+            margin-top: 0.5rem;
+        }
+        .scale-item {
+            flex: 1;
+            text-align: center;
+            padding: 0.25rem;
+            border-radius: 4px;
+            font-size: 0.65rem;
+        }
+        .scale-item.active {
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        /* Heatmap Legend */
+        .heatmap-legend {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.7rem;
+        }
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+    <!-- Mobile Navigation Toggle -->
+    <button class="mobile-nav-toggle fixed top-4 left-4 z-50 bg-emerald-600 text-white p-3 rounded-lg shadow-lg lg:hidden" onclick="toggleMobileNav()">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+    </button>
+
+    <!-- Mobile Nav Overlay -->
+    <div id="mobileNavOverlay" class="fixed inset-0 bg-black/50 z-40 lg:hidden hidden" onclick="toggleMobileNav()"></div>
+
+    <!-- Header / Hero Section -->
+    <header id="home" class="bg-emerald-800 text-white py-12 shadow-lg relative overflow-hidden scroll-mt-20">
+        <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+        <div class="container mx-auto px-4 relative z-10">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-6 md:mb-0 text-center md:text-right">
+                    <h1 class="text-4xl md:text-5xl font-bold mb-2">مشروع زواج عبدالله</h1>
+                    <p class="text-emerald-200 text-lg">ملف إدارة مشروع متكامل (PMP Standard)</p>
+                </div>
+                <div class="flex gap-4">
+                    <div class="bg-white/10 backdrop-blur-md p-4 rounded-lg text-center min-w-[120px]">
+                        <span class="block text-sm text-emerald-200">الميزانية</span>
+                        <span class="block text-2xl font-bold" id="headerBudget">49,500 ر.س</span>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-md p-4 rounded-lg text-center min-w-[120px]">
+                        <span class="block text-sm text-emerald-200">المدة</span>
+                        <span class="block text-2xl font-bold" id="headerDuration">6 أيام</span>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-md p-4 rounded-lg text-center min-w-[120px]">
+                        <span class="block text-sm text-emerald-200">المنهجية</span>
+                        <span class="block text-2xl font-bold">Waterfall</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-4 gap-8">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="lg:col-span-1">
+            <nav class="sidebar-nav sticky top-8 glass-panel rounded-xl p-6 shadow-sm">
+                <div class="flex justify-between items-center mb-4 lg:hidden">
+                    <h3 class="font-bold text-gray-800">فهرس المشروع</h3>
+                    <button onclick="toggleMobileNav()" class="text-gray-500 hover:text-gray-700">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <h3 class="font-bold text-gray-800 mb-4 border-b pb-2 hidden lg:block">فهرس المشروع</h3>
+                <ul class="space-y-1 text-sm" id="projectIndex">
+                    <li><a href="#home" class="nav-link block p-3 rounded-lg hover:bg-emerald-50 hover:text-emerald-700 transition" onclick="scrollToSection(event, 'home')">🏠 الرئيسية</a></li>
+                    <li><a href="#wbs" class="nav-link block p-3 rounded-lg hover:bg-emerald-50 hover:text-emerald-700 transition" onclick="scrollToSection(event, 'wbs')">📊 1. هيكل تجزئة العمل (WBS)</a></li>
+                    <li><a href="#rtm" class="nav-link block p-3 rounded-lg hover:bg-emerald-50 hover:text-emerald-700 transition" onclick="scrollToSection(event, 'rtm')">📋 2. مصفوفة التتبع (RTM)</a></li>
+                    <li><a href="#risks" class="nav-link block p-3 rounded-lg hover:bg-emerald-50 hover:text-emerald-700 transition" onclick="scrollToSection(event, 'risks')">⚠️ 3. سجل المخاطر</a></li>
+                    <li><a href="#estimation" class="nav-link block p-3 rounded-lg hover:bg-emerald-50 hover:text-emerald-700 transition" onclick="scrollToSection(event, 'estimation')">⏱️ 4. التقدير والجدولة</a></li>
+                    <li><a href="#critical-path" class="nav-link block p-3 rounded-lg hover:bg-emerald-50 hover:text-emerald-700 transition" onclick="scrollToSection(event, 'critical-path')">🔗 5. المسار الحرج</a></li>
+                    <li><a href="#evm" class="nav-link block p-3 rounded-lg hover:bg-emerald-50 hover:text-emerald-700 transition" onclick="scrollToSection(event, 'evm')">📈 6. إدارة القيمة المكتسبة (EVM)</a></li>
+                    <li><a href="#plans" class="nav-link block p-3 rounded-lg hover:bg-emerald-50 hover:text-emerald-700 transition" onclick="scrollToSection(event, 'plans')">📞 7. خطط الاتصال والمشتريات</a></li>
+                    <li><a href="#domains" class="nav-link block p-3 rounded-lg hover:bg-emerald-50 hover:text-emerald-700 transition" onclick="scrollToSection(event, 'domains')">🎯 8. مجالات الأداء</a></li>
+                </ul>
+                <div class="mt-6 pt-4 border-t hidden lg:block">
+                    <p class="text-xs text-gray-500 text-center">اضغط على أي عنصر للانتقال للقسم</p>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="lg:col-span-3 space-y-12">
+
+            <!-- 1. WBS Section -->
+            <section id="wbs" class="glass-panel rounded-xl p-8 scroll-mt-20 section-content">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 section-title">📊 هيكل تجزئة العمل (WBS)</h2>
+                    <button onclick="openWBSModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-bold transition flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                        </svg>
+                        إدارة WBS
+                    </button>
+                </div>
+                <!-- WBS KPIs -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                    <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg border-l-4 border-blue-500">
+                        <p class="text-xs text-blue-600 font-semibold uppercase">معدل الإنجاز</p>
+                        <p class="text-2xl font-bold text-blue-800" id="wbsKpiCompletionRate">0%</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg border-l-4 border-green-500">
+                        <p class="text-xs text-green-600 font-semibold uppercase">الميزانية المستخدمة</p>
+                        <p class="text-2xl font-bold text-green-800" id="wbsKpiBudgetUsed">0%</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-orange-50 to-orange-100 p-4 rounded-lg border-l-4 border-orange-500">
+                        <p class="text-xs text-orange-600 font-semibold uppercase">المهام المكتملة</p>
+                        <p class="text-2xl font-bold text-orange-800" id="wbsKpiCompletedTasks">0/0</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg border-l-4 border-purple-500">
+                        <p class="text-xs text-purple-600 font-semibold uppercase">صحة المشروع</p>
+                        <p class="text-2xl font-bold text-purple-800" id="wbsKpiHealth">🟢 جيد</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="wbsContainer">
+                    <!-- WBS items will be rendered here -->
+                </div>
+            </section>
+
+            <!-- 2. RTM Section -->
+            <section id="rtm" class="glass-panel rounded-xl p-8 scroll-mt-20 section-content">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 section-title">📋 مصفوفة تتبع المتطلبات (RTM)</h2>
+                    <button onclick="openRTMModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-bold transition flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                        </svg>
+                        إدارة RTM
+                    </button>
+                </div>
+                <!-- RTM KPIs -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                    <div class="bg-gradient-to-br from-emerald-50 to-emerald-100 p-4 rounded-lg border-l-4 border-emerald-500">
+                        <p class="text-xs text-emerald-600 font-semibold uppercase">نسبة الإنجاز</p>
+                        <p class="text-2xl font-bold text-emerald-800" id="rtmKpiCompletionRate">0%</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-red-50 to-red-100 p-4 rounded-lg border-l-4 border-red-500">
+                        <p class="text-xs text-red-600 font-semibold uppercase">أولويات عالية</p>
+                        <p class="text-2xl font-bold text-red-800" id="rtmKpiHighPriority">0</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 p-4 rounded-lg border-l-4 border-yellow-500">
+                        <p class="text-xs text-yellow-600 font-semibold uppercase">قيد الانتظار</p>
+                        <p class="text-2xl font-bold text-yellow-800" id="rtmKpiPending">0</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-cyan-50 to-cyan-100 p-4 rounded-lg border-l-4 border-cyan-500">
+                        <p class="text-xs text-cyan-600 font-semibold uppercase">معدل التتبع</p>
+                        <p class="text-2xl font-bold text-cyan-800" id="rtmKpiTrackingRate">100%</p>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-right text-gray-500">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-100">
+                            <tr>
+                                <th scope="col" class="px-6 py-3">Req ID</th>
+                                <th scope="col" class="px-6 py-3">المتطلب</th>
+                                <th scope="col" class="px-6 py-3">الوصف</th>
+                                <th scope="col" class="px-6 py-3">المسؤول</th>
+                                <th scope="col" class="px-6 py-3">الحالة</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rtmBody">
+                            <!-- RTM items will be rendered here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 3. Risks Section -->
+            <section id="risks" class="glass-panel rounded-xl p-8 scroll-mt-20 section-content">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 section-title">⚠️ سجل المخاطر (Risk Register)</h2>
+                    <button onclick="openRisksModal()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-bold transition flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                        </svg>
+                        إدارة المخاطر
+                    </button>
+                </div>
+                <!-- Risk KPIs -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                    <div class="bg-gradient-to-br from-red-50 to-red-100 p-4 rounded-lg border-l-4 border-red-500">
+                        <p class="text-xs text-red-600 font-semibold uppercase">مؤشر المخاطر</p>
+                        <p class="text-2xl font-bold text-red-800" id="riskKpiIndex">0/100</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-orange-50 to-orange-100 p-4 rounded-lg border-l-4 border-orange-500">
+                        <p class="text-xs text-orange-600 font-semibold uppercase">مخاطر عالية</p>
+                        <p class="text-2xl font-bold text-orange-800" id="riskKpiHigh">0</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 p-4 rounded-lg border-l-4 border-yellow-500">
+                        <p class="text-xs text-yellow-600 font-semibold uppercase">متوسطة</p>
+                        <p class="text-2xl font-bold text-yellow-800" id="riskKpiMedium">0</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg border-l-4 border-blue-500">
+                        <p class="text-xs text-blue-600 font-semibold uppercase">معدل التخفيف</p>
+                        <p class="text-2xl font-bold text-blue-800" id="riskKpiMitigation">0%</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="risksContainer">
+                    <!-- Risk items will be rendered here -->
+                </div>
+                <div class="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="stats-card bg-white p-4 rounded-xl shadow-sm border-r-4 border-red-500">
+                        <p class="text-sm text-gray-500">مخاطر حرجة</p>
+                        <p class="text-2xl font-bold text-red-600" id="riskCritical">0</p>
+                    </div>
+                    <div class="stats-card bg-white p-4 rounded-xl shadow-sm border-r-4 border-orange-500">
+                        <p class="text-sm text-gray-500">مخاطر عالية</p>
+                        <p class="text-2xl font-bold text-orange-600" id="riskHigh">0</p>
+                    </div>
+                    <div class="stats-card bg-white p-4 rounded-xl shadow-sm border-r-4 border-yellow-500">
+                        <p class="text-sm text-gray-500">مخاطر متوسطة</p>
+                        <p class="text-2xl font-bold text-yellow-600" id="riskMedium">0</p>
+                    </div>
+                    <div class="stats-card bg-white p-4 rounded-xl shadow-sm border-r-4 border-green-500">
+                        <p class="text-sm text-gray-500">الإجمالي</p>
+                        <p class="text-2xl font-bold text-green-600" id="riskTotal">0</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. Estimation & Schedule -->
+            <section id="estimation" class="glass-panel rounded-xl p-8 scroll-mt-20 section-content">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 section-title">⏱️ التقدير والجدولة</h2>
+                    <button onclick="openEstimationModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-bold transition flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                        </svg>
+                        تعديل وإضافة
+                    </button>
+                </div>
+                <!-- Estimation KPIs -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                    <div class="bg-gradient-to-br from-indigo-50 to-indigo-100 p-4 rounded-lg border-l-4 border-indigo-500">
+                        <p class="text-xs text-indigo-600 font-semibold uppercase">الوقت المتبقي</p>
+                        <p class="text-2xl font-bold text-indigo-800" id="estimationKpiTimeRemaining">6 أيام</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-pink-50 to-pink-100 p-4 rounded-lg border-l-4 border-pink-500">
+                        <p class="text-xs text-pink-600 font-semibold uppercase">دقة التقدير</p>
+                        <p class="text-2xl font-bold text-pink-800" id="estimationKpiAccuracy">95%</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-violet-50 to-violet-100 p-4 rounded-lg border-l-4 border-violet-500">
+                        <p class="text-xs text-violet-600 font-semibold uppercase">معامل PERT</p>
+                        <p class="text-2xl font-bold text-violet-800" id="estimationKpiPERT">3.3 أيام</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-sky-50 to-sky-100 p-4 rounded-lg border-l-4 border-sky-500">
+                        <p class="text-xs text-sky-600 font-semibold uppercase">حالة الجدول</p>
+                        <p class="text-2xl font-bold text-sky-800" id="estimationKpiStatus">🟡 محاطر</p>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                    <div>
+                        <h3 class="font-bold text-lg mb-4 text-emerald-700">أنواع التقدير</h3>
+                        <div class="space-y-3" id="estimationTypesContainer">
+                            <div class="bg-gray-50 p-3 rounded border-r-4 border-blue-500">
+                                <span class="font-bold text-sm block">1. التقدير الحتمي</span>
+                                <span class="text-xs text-gray-600">الكوشة: 3 أيام | الدعوات: يومان</span>
+                            </div>
+                            <div class="bg-gray-50 p-3 rounded border-r-4 border-purple-500">
+                                <span class="font-bold text-sm block">2. التقدير الاحتمالي (PERT)</span>
+                                <span class="text-xs text-gray-600 block mb-1">الكوشة: (2 + 4(3) + 6) / 6</span>
+                                <span class="font-mono text-emerald-600 font-bold">= 3.3 أيام</span>
+                            </div>
+                            <div class="bg-gray-50 p-3 rounded border-r-4 border-orange-500">
+                                <span class="font-bold text-sm block">3. التقدير النسبي</span>
+                                <span class="text-xs text-gray-600">الإضاءة: 5 ساعات × 0.8 = 4 ساعات</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="font-bold text-lg mb-4 text-emerald-700">الجدول الزمني (Gantt View)</h3>
+                        <div class="space-y-3" id="ganttContainer">
+                            <div>
+                                <div class="flex justify-between text-xs mb-1"><span>حجز القاعة</span><span>يوم 1</span></div>
+                                <div class="w-full bg-gray-200 rounded-full h-2.5"><div class="bg-blue-600 h-2.5 rounded-full" style="width: 15%"></div></div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-xs mb-1"><span>تجهيز الكوشة (PERT)</span><span>3.3 أيام</span></div>
+                                <div class="w-full bg-gray-200 rounded-full h-2.5"><div class="bg-emerald-600 h-2.5 rounded-full" style="width: 50%"></div></div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-xs mb-1"><span>الدعوات</span><span>يومان</span></div>
+                                <div class="w-full bg-gray-200 rounded-full h-2.5"><div class="bg-purple-600 h-2.5 rounded-full" style="width: 30%"></div></div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-xs mb-1"><span>يوم الزواج</span><span>يوم 6</span></div>
+                                <div class="w-full bg-gray-200 rounded-full h-2.5"><div class="bg-red-500 h-2.5 rounded-full" style="width: 15%; margin-right: 85%"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. Critical Path -->
+            <section id="critical-path" class="glass-panel rounded-xl p-8 scroll-mt-20 section-content bg-gray-900 text-white">
+                <h2 class="text-2xl font-bold section-title text-white border-b border-gray-700 pb-4 mb-6">🔗 المسار الحرج (Critical Path)</h2>
+                <!-- Critical Path KPIs -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                    <div class="bg-gray-800 border-l-4 border-emerald-500 p-4 rounded-lg">
+                        <p class="text-xs text-emerald-400 font-semibold uppercase">المدة الحرجة</p>
+                        <p class="text-2xl font-bold text-emerald-300" id="cpKpiDuration">5.8 أيام</p>
+                    </div>
+                    <div class="bg-gray-800 border-l-4 border-red-500 p-4 rounded-lg">
+                        <p class="text-xs text-red-400 font-semibold uppercase">الأنشطة الحرجة</p>
+                        <p class="text-2xl font-bold text-red-300" id="cpKpiActivities">4</p>
+                    </div>
+                    <div class="bg-gray-800 border-l-4 border-orange-500 p-4 rounded-lg">
+                        <p class="text-xs text-orange-400 font-semibold uppercase">الحد الآمن</p>
+                        <p class="text-2xl font-bold text-orange-300" id="cpKpiBuffer">0 يوم</p>
+                    </div>
+                    <div class="bg-gray-800 border-l-4 border-yellow-500 p-4 rounded-lg">
+                        <p class="text-xs text-yellow-400 font-semibold uppercase">التأثير</p>
+                        <p class="text-2xl font-bold text-yellow-300" id="cpKpiImpact">⚠️ عالي</p>
+                    </div>
+                </div>
+                <div class="flex items-center justify-center py-8 overflow-x-auto">
+                    <div class="critical-path-node">A<br><span class="text-xs font-normal">القاعة</span></div>
+                    <div class="critical-path-line"></div>
+                    <div class="critical-path-node">B<br><span class="text-xs font-normal">الكوشة</span></div>
+                    <div class="critical-path-line"></div>
+                    <div class="critical-path-node">C<br><span class="text-xs font-normal">الإضاءة</span></div>
+                    <div class="critical-path-line"></div>
+                    <div class="critical-path-node bg-emerald-600 text-white border-emerald-400">H<br><span class="text-xs font-normal">الزواج</span></div>
+                </div>
+                <div class="text-center mt-4">
+                    <p class="text-gray-400 text-sm">المدة الإجمالية للمسار الحرج: <span class="text-emerald-400 font-bold text-lg" id="criticalPathDuration">5.8 أيام</span></p>
+                    <p class="text-xs text-gray-500 mt-2">أي تأخير في هذه الأنشطة يؤثر مباشرة على تاريخ الانتهاء.</p>
+                </div>
+            </section>
+
+            <!-- 6. EVM Section -->
+            <section id="evm" class="glass-panel rounded-xl p-8 scroll-mt-20 section-content">
+                <h2 class="text-2xl font-bold text-gray-800 section-title">📈 إدارة القيمة المكتسبة (EVM)</h2>
+                <!-- EVM KPIs -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                    <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg border-l-4 border-blue-500">
+                        <p class="text-xs text-blue-600 font-semibold uppercase">مؤشر الأداء SPI</p>
+                        <p class="text-2xl font-bold text-blue-800" id="evmKpiSPI">0.90</p>
+                        <p class="text-xs text-blue-600 mt-1">متأخر بـ 10%</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg border-l-4 border-green-500">
+                        <p class="text-xs text-green-600 font-semibold uppercase">مؤشر التكلفة CPI</p>
+                        <p class="text-2xl font-bold text-green-800" id="evmKpiCPI">0.97</p>
+                        <p class="text-xs text-green-600 mt-1">تجاوز 3%</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-orange-50 to-orange-100 p-4 rounded-lg border-l-4 border-orange-500">
+                        <p class="text-xs text-orange-600 font-semibold uppercase">انحراف الجدول SV</p>
+                        <p class="text-2xl font-bold text-orange-800" id="evmKpiSV">-2,350</p>
+                        <p class="text-xs text-orange-600 mt-1">متأخر بـ 9.9%</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-red-50 to-red-100 p-4 rounded-lg border-l-4 border-red-500">
+                        <p class="text-xs text-red-600 font-semibold uppercase">انحراف التكلفة CV</p>
+                        <p class="text-2xl font-bold text-red-800" id="evmKpiCV">-650</p>
+                        <p class="text-xs text-red-600 mt-1">تجاوز 2.7%</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 rounded-lg shadow-inner">
+                        <h3 class="font-bold text-gray-700 mb-4 border-b pb-2">بيانات الأداء (اليوم الثالث)</h3>
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">القيمة المخططة (PV)</span>
+                                <span class="font-bold text-gray-800">23,700 ر.س</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">القيمة المكتسبة (EV)</span>
+                                <span class="font-bold text-emerald-600">21,350 ر.س</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">التكلفة الفعلية (AC)</span>
+                                <span class="font-bold text-red-600">22,000 ر.س</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="bg-red-50 p-4 rounded-lg border border-red-200">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="font-bold text-red-800">انحراف الجدول (SV)</span>
+                                <span class="font-mono font-bold text-red-700">-2,350</span>
+                            </div>
+                            <p class="text-xs text-red-600">المشروع متأخر عن الجدول</p>
+                            <div class="w-full bg-red-200 rounded-full h-1.5 mt-2">
+                                <div class="bg-red-600 h-1.5 rounded-full" style="width: 10%"></div>
+                            </div>
+                        </div>
+
+                        <div class="bg-orange-50 p-4 rounded-lg border border-orange-200">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="font-bold text-orange-800">انحراف التكلفة (CV)</span>
+                                <span class="font-mono font-bold text-orange-700">-650</span>
+                            </div>
+                            <p class="text-xs text-orange-600">تجاوز بسيط للميزانية</p>
+                            <div class="w-full bg-orange-200 rounded-full h-1.5 mt-2">
+                                <div class="bg-orange-600 h-1.5 rounded-full" style="width: 5%"></div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-blue-50 p-3 rounded text-center">
+                                <span class="block text-xs text-blue-600">مؤشر الأداء (SPI)</span>
+                                <span class="block text-xl font-bold text-blue-800">0.90</span>
+                                <span class="text-[10px] text-gray-500">إنجاز 90% من المخطط</span>
+                            </div>
+                            <div class="bg-blue-50 p-3 rounded text-center">
+                                <span class="block text-xs text-blue-600">مؤشر التكلفة (CPI)</span>
+                                <span class="block text-xl font-bold text-blue-800">0.97</span>
+                                <span class="text-[10px] text-gray-500">كفاءة تكلفة جيدة</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 7. Plans & Domains -->
+            <section id="plans" class="glass-panel rounded-xl p-8 scroll-mt-20 section-content">
+                <h2 class="text-2xl font-bold text-gray-800 section-title">📞 خطط الاتصال والمشتريات</h2>
+                <!-- Communication & Procurement KPIs -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                    <div class="bg-gradient-to-br from-teal-50 to-teal-100 p-4 rounded-lg border-l-4 border-teal-500">
+                        <p class="text-xs text-teal-600 font-semibold uppercase">قنوات الاتصال</p>
+                        <p class="text-2xl font-bold text-teal-800" id="plansKpiChannels">3</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-lime-50 to-lime-100 p-4 rounded-lg border-l-4 border-lime-500">
+                        <p class="text-xs text-lime-600 font-semibold uppercase">تكرار الاتصال</p>
+                        <p class="text-2xl font-bold text-lime-800" id="plansKpiFrequency">يومي</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-amber-50 to-amber-100 p-4 rounded-lg border-l-4 border-amber-500">
+                        <p class="text-xs text-amber-600 font-semibold uppercase">عناصر المشتريات</p>
+                        <p class="text-2xl font-bold text-amber-800" id="plansKpiProcurement">3</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-fuchsia-50 to-fuchsia-100 p-4 rounded-lg border-l-4 border-fuchsia-500">
+                        <p class="text-xs text-fuchsia-600 font-semibold uppercase">إجمالي المشتريات</p>
+                        <p class="text-2xl font-bold text-fuchsia-800" id="plansKpiTotal">35,000 ر.س</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="font-bold text-emerald-700 mb-3">خطة الاتصال</h3>
+                        <table class="w-full text-sm text-right text-gray-500 bg-white rounded shadow-sm">
+                            <thead class="bg-gray-50 text-xs uppercase">
+                                <tr>
+                                    <th class="px-3 py-2">الجهة</th>
+                                    <th class="px-3 py-2">النوع</th>
+                                    <th class="px-3 py-2">التكرار</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b"><td class="px-3 py-2">العريس</td><td class="px-3 py-2">واتساب</td><td class="px-3 py-2">يومي</td></tr>
+                                <tr class="border-b"><td class="px-3 py-2">الديكور</td><td class="px-3 py-2">اجتماع</td><td class="px-3 py-2">كل يومين</td></tr>
+                                <tr><td class="px-3 py-2">الضيافة</td><td class="px-3 py-2">اتصال</td><td class="px-3 py-2">أسبوعي</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-emerald-700 mb-3">خطة المشتريات</h3>
+                        <table class="w-full text-sm text-right text-gray-500 bg-white rounded shadow-sm">
+                            <thead class="bg-gray-50 text-xs uppercase">
+                                <tr>
+                                    <th class="px-3 py-2">العنصر</th>
+                                    <th class="px-3 py-2">العقد</th>
+                                    <th class="px-3 py-2">التكلفة</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b"><td class="px-3 py-2">القاعة</td><td class="px-3 py-2">ثابت</td><td class="px-3 py-2">15,000</td></tr>
+                                <tr class="border-b"><td class="px-3 py-2">الكوشة</td><td class="px-3 py-2">ثابت</td><td class="px-3 py-2">8,000</td></tr>
+                                <tr><td class="px-3 py-2">الضيافة</td><td class="px-3 py-2">شامل</td><td class="px-3 py-2">12,000</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 8. Domains -->
+            <section id="domains" class="glass-panel rounded-xl p-8 scroll-mt-20 section-content mb-12">
+                <h2 class="text-2xl font-bold text-gray-800 section-title">🎯 مجالات الأداء (Work Performance Domains)</h2>
+                <!-- Overall Project KPIs -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 bg-gradient-to-r from-emerald-50 to-blue-50 p-6 rounded-lg border-2 border-emerald-200">
+                    <div class="text-center">
+                        <p class="text-sm text-gray-600 font-semibold uppercase mb-2">صحة المشروع الإجمالية</p>
+                        <div class="flex justify-center items-center">
+                            <div class="text-5xl font-bold" id="domainsKpiOverallHealth">🟡</div>
+                        </div>
+                        <p class="text-sm text-gray-700 mt-2" id="domainsKpiHealthDesc">متوازن مع مراقبة</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600 font-semibold uppercase mb-3">توازن مؤشرات الأداء</p>
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-gray-700">الجدول الزمني</span>
+                                <div class="w-32 bg-gray-200 rounded-full h-2"><div class="bg-orange-500 h-2 rounded-full" style="width: 90%"></div></div>
+                            </div>
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-gray-700">الميزانية</span>
+                                <div class="w-32 bg-gray-200 rounded-full h-2"><div class="bg-yellow-500 h-2 rounded-full" style="width: 97%"></div></div>
+                            </div>
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-gray-700">الجودة</span>
+                                <div class="w-32 bg-gray-200 rounded-full h-2"><div class="bg-green-500 h-2 rounded-full" style="width: 95%"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="planning-card bg-emerald-50 p-4 rounded text-center hover:shadow-md transition cursor-pointer" onclick="openPlanningModal()">
+                        <div class="text-2xl mb-2">📋</div>
+                        <h4 class="font-bold text-emerald-800 text-sm">التخطيط</h4>
+                        <p class="text-xs text-gray-600 mt-1">WBS + الجدول</p>
+                        <span class="inline-block mt-2 text-xs text-emerald-600 font-semibold">اضغط للتفاصيل ←</span>
+                    </div>
+                    <div class="estimation-card bg-emerald-50 p-4 rounded text-center hover:shadow-md transition cursor-pointer" onclick="openEstimationModal()">
+                        <div class="text-2xl mb-2">⏱️</div>
+                        <h4 class="font-bold text-emerald-800 text-sm">التقدير والجدولة</h4>
+                        <p class="text-xs text-gray-600 mt-1">PERT + Gantt</p>
+                        <span class="inline-block mt-2 text-xs text-emerald-600 font-semibold">اضغط للتفاصيل ←</span>
+                    </div>
+                    <div class="stakeholder-card bg-emerald-50 p-4 rounded text-center hover:shadow-md transition cursor-pointer" onclick="openStakeholderModal()">
+                        <div class="text-2xl mb-2">👥</div>
+                        <h4 class="font-bold text-emerald-800 text-sm">أصحاب المصلحة</h4>
+                        <p class="text-xs text-gray-600 mt-1">إدارة التوقعات</p>
+                        <span class="inline-block mt-2 text-xs text-emerald-600 font-semibold">اضغط للتفاصيل ←</span>
+                    </div>
+                    <div class="risk-card bg-emerald-50 p-4 rounded text-center hover:shadow-md transition cursor-pointer" onclick="openRisksModal()">
+                        <div class="text-2xl mb-2">⚠️</div>
+                        <h4 class="font-bold text-emerald-800 text-sm">عدم اليقين</h4>
+                        <p class="text-xs text-gray-600 mt-1">إدارة المخاطر</p>
+                        <span class="inline-block mt-2 text-xs text-emerald-600 font-semibold">اضغط للتفاصيل ←</span>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Risks Management Modal -->
+    <div id="risksModal" class="modal-overlay" onclick="closeRisksModal(event)">
+        <div class="modal-content w-full bg-gray-50 overflow-y-auto max-h-screen">
+            <div class="container mx-auto px-4 py-8 max-w-7xl">
+                <!-- Modal Header -->
+                <div class="flex justify-between items-center mb-8 bg-white p-6 rounded-xl shadow-lg sticky top-0 z-50">
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-800">سجل المخاطر (Risk Register)</h2>
+                        <p class="text-gray-500 mt-1">إدارة وتتبع مخاطر المشروع - قابل للتعديل والإضافة</p>
+                    </div>
+                    <button onclick="closeRisksModalDirect()" class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg font-bold transition flex items-center gap-2">
+                        <span>إغلاق</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Risk Stats -->
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+                    <div class="stats-card bg-white p-4 rounded-xl shadow-sm border-r-4 border-red-500">
+                        <p class="text-sm text-gray-500">مخاطر حرجة</p>
+                        <p class="text-2xl font-bold text-red-600" id="riskModalCritical">0</p>
+                    </div>
+                    <div class="stats-card bg-white p-4 rounded-xl shadow-sm border-r-4 border-orange-500">
+                        <p class="text-sm text-gray-500">مخاطر عالية</p>
+                        <p class="text-2xl font-bold text-orange-600" id="riskModalHigh">0</p>
+                    </div>
+                    <div class="stats-card bg-white p-4 rounded-xl shadow-sm border-r-4 border-yellow-500">
+                        <p class="text-sm text-gray-500">مخاطر متوسطة</p>
+                        <p class="text-2xl font-bold text-yellow-600" id="riskModalMedium">0</p>
+                    </div>
+                    <div class="stats-card bg-white p-4 rounded-xl shadow-sm border-r-4 border-green-500">
+                        <p class="text-sm text-gray-500">مخاطر منخفضة</p>
+                        <p class="text-2xl font-bold text-green-600" id="riskModalLow">0</p>
+                    </div>
+                    <div class="stats-card bg-white p-4 rounded-xl shadow-sm border-r-4 border-purple-500">
+                        <p class="text-sm text-gray-500">الإجمالي</p>
+                        <p class="text-2xl font-bold text-purple-600" id="riskModalTotal">0</p>
+                    </div>
+                </div>
+
+                <!-- Risk Matrix -->
+                <div class="bg-white p-6 rounded-xl shadow-lg mb-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">مصفوفة المخاطر (Risk Matrix)</h3>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div>
+                            <div class="risk-matrix max-w-md mx-auto mb-4">
+                                <!-- Will be generated by JS -->
+                            </div>
+                            <div class="heatmap-legend justify-center">
+                                <div class="legend-item">
+                                    <div class="legend-color" style="background: #dc2626;"></div>
+                                    <span>حرجة (20-25)</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-color" style="background: #f97316;"></div>
+                                    <span>عالية (12-16)</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-color" style="background: #eab308;"></div>
+                                    <span>متوسطة (6-9)</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-color" style="background: #22c55e;"></div>
+                                    <span>منخفضة (1-4)</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-gray-700 mb-2">توزيع المخاطر</h4>
+                            <canvas id="riskChart" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filters and Search -->
+                <div class="bg-white p-6 rounded-xl shadow-lg mb-6">
+                    <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+                        <div class="flex gap-2 flex-wrap">
+                            <button onclick="filterRisks('all')" class="filter-btn active px-4 py-2 rounded-lg text-sm font-medium transition">الكل</button>
+                            <button onclick="filterRisks('critical')" class="filter-btn px-4 py-2 rounded-lg text-sm font-medium bg-red-50 text-red-700 hover:bg-red-100 transition">حرجة</button>
+                            <button onclick="filterRisks('high')" class="filter-btn px-4 py-2 rounded-lg text-sm font-medium bg-orange-50 text-orange-700 hover:bg-orange-100 transition">عالية</button>
+                            <button onclick="filterRisks('medium')" class="filter-btn px-4 py-2 rounded-lg text-sm font-medium bg-yellow-50 text-yellow-700 hover:bg-yellow-100 transition">متوسطة</button>
+                            <button onclick="filterRisks('low')" class="filter-btn px-4 py-2 rounded-lg text-sm font-medium bg-green-50 text-green-700 hover:bg-green-100 transition">منخفضة</button>
+                        </div>
+                        <div class="flex gap-2 w-full md:w-auto">
+                            <div class="relative flex-1 md:w-64">
+                                <input type="text" id="riskSearch" oninput="searchRisks()" placeholder="بحث عن خطر..." class="search-input w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none">
+                                <svg class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
+                            </div>
+                            <button onclick="openAddRiskModal()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-bold transition flex items-center gap-2 whitespace-nowrap">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                                </svg>
+                                إضافة خطر
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Risk Cards View -->
+                    <div class="bg-white p-6 rounded-xl shadow-lg">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">عرض البطاقات</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="risksCardsView">
+                            <!-- Risk cards will be rendered here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="mt-8 text-center">
+                    <button onclick="closeRisksModalDirect()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-lg font-bold transition">
+                        حفظ والعودة للصفحة الرئيسية
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Risk Modal -->
+    <div id="addRiskModal" class="modal-overlay" onclick="closeAddRiskModal(event)">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-xl shadow-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+                <h3 class="text-xl font-bold text-gray-800 mb-6">إضافة خطر جديد</h3>
+                <form id="addRiskForm" onsubmit="addRiskItem(event)">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">معرف الخطر (ID)</label>
+                            <input type="text" id="riskId" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none" placeholder="R-01" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">المالك</label>
+                            <input type="text" id="riskOwner" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none" placeholder="المسؤول عن المتابعة" required>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">وصف الخطر</label>
+                            <input type="text" id="riskName" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none" placeholder="مثال: تأخر الكوشة" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">الاحتمال</label>
+                            <select id="riskProbability" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none" onchange="calculateRiskLevel()">
+                                <option value="1">1 - منخفض جداً</option>
+                                <option value="2">2 - منخفض</option>
+                                <option value="3" selected>3 - متوسط</option>
+                                <option value="4">4 - عالي</option>
+                                <option value="5">5 - عالي جداً</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">التأثير</label>
+                            <select id="riskImpact" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none" onchange="calculateRiskLevel()">
+                                <option value="1">1 - منخفض جداً</option>
+                                <option value="2">2 - منخفض</option>
+                                <option value="3" selected>3 - متوسط</option>
+                                <option value="4">4 - عالي</option>
+                                <option value="5">5 - عالي جداً</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">مستوى الخطر المحسوب</label>
+                            <div id="riskLevelPreview" class="risk-badge risk-badge-medium px-4 py-2 text-center">متوسط (9)</div>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">خطة الاستجابة</label>
+                            <textarea id="riskResponse" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none" rows="3" placeholder="الإجراءات المتخذة للتعامل مع هذا الخطر" required></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">نوع الاستجابة</label>
+                            <select id="riskResponseType" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none">
+                                <option value="mitigate">تخفيف</option>
+                                <option value="avoid">تجنب</option>
+                                <option value="transfer">نقل</option>
+                                <option value="accept">قبول</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">تاريخ المراجعة</label>
+                            <input type="date" id="riskReviewDate" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none">
+                        </div>
+                    </div>
+                    <div class="flex gap-4 mt-6">
+                        <button type="submit" class="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-bold transition">إضافة</button>
+                        <button type="button" onclick="closeAddRiskModalDirect()" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded-lg font-bold transition">إلغاء</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Other Modals (WBS, RTM, Estimation, Stakeholder, Planning) -->
+    <div id="wbsModal" class="modal-overlay" onclick="closeWBSModal(event)">
+        <div class="modal-content w-full bg-gray-50 overflow-y-auto max-h-screen">
+            <div class="container mx-auto px-4 py-8 max-w-7xl">
+                <!-- Modal Header -->
+                <div class="flex justify-between items-center mb-8 bg-white p-6 rounded-xl shadow-lg sticky top-0 z-50">
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-800">هيكل تجزئة العمل (WBS)</h2>
+                        <p class="text-gray-500 mt-1">إدارة وإضافة حزم العمل والمهام الفرعية</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="openAddWBSModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-bold transition flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                            </svg>
+                            إضافة حزمة عمل
+                        </button>
+                        <button onclick="closeWBSModalDirect()" class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg font-bold transition flex items-center gap-2">إغلاق</button>
+                    </div>
+                </div>
+
+                <!-- WBS Advanced Stats -->
+                <div class="bg-gradient-to-r from-emerald-50 to-blue-50 p-6 rounded-xl shadow-lg mb-6 border border-emerald-200">
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                        <div class="wbs-stat-card border-l-4 border-emerald-600">
+                            <p class="wbs-stat-label">الحزم</p>
+                            <p class="wbs-stat-value" id="wbsTotalPackages">0</p>
+                            <p class="wbs-stat-subtitle">إجمالي الحزم</p>
+                        </div>
+                        <div class="wbs-stat-card border-l-4 border-blue-600">
+                            <p class="wbs-stat-label">المهام</p>
+                            <p class="wbs-stat-value" id="wbsTotalTasks">0</p>
+                            <p class="wbs-stat-subtitle">إجمالي المهام</p>
+                        </div>
+                        <div class="wbs-stat-card border-l-4 border-purple-600">
+                            <p class="wbs-stat-label">المكتملة</p>
+                            <p class="wbs-stat-value" id="wbsCompletedTasks">0</p>
+                            <p class="wbs-stat-subtitle">مهام منجزة</p>
+                        </div>
+                        <div class="wbs-stat-card border-l-4 border-orange-600">
+                            <p class="wbs-stat-label">الإنجاز</p>
+                            <p class="wbs-stat-value" id="wbsCompletionRate">0%</p>
+                            <p class="wbs-stat-subtitle">معدل الإنجاز</p>
+                        </div>
+                        <div class="wbs-stat-card border-l-4 border-green-600">
+                            <p class="wbs-stat-label">الميزانية</p>
+                            <p class="wbs-stat-value text-lg" id="wbsTotalBudget">0</p>
+                            <p class="wbs-stat-subtitle">ر.س</p>
+                        </div>
+                        <div class="wbs-stat-card border-l-4 border-indigo-600">
+                            <p class="wbs-stat-label">المدة</p>
+                            <p class="wbs-stat-value" id="wbsTotalDuration">0</p>
+                            <p class="wbs-stat-subtitle">يوماً</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance Indicators -->
+                <div class="bg-white p-6 rounded-xl shadow-lg mb-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                        📊 مؤشرات الأداء الرئيسية (KPIs)
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <h4 class="font-semibold text-gray-700 mb-3">الحالة حسب الحزم</h4>
+                            <div class="space-y-2">
+                                <div>
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span>قيد الانتظار</span>
+                                        <span class="font-bold text-yellow-600" id="wbsStatusPending">0</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-yellow-500 h-2 rounded-full" id="wbsStatusPendingBar"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span>جاري التنفيذ</span>
+                                        <span class="font-bold text-blue-600" id="wbsStatusInProgress">0</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-blue-500 h-2 rounded-full" id="wbsStatusInProgressBar"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-sm mb-1">
+                                        <span>مكتملة</span>
+                                        <span class="font-bold text-green-600" id="wbsStatusCompleted">0</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-green-500 h-2 rounded-full" id="wbsStatusCompletedBar"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-gray-700 mb-3">توزيع الميزانية</h4>
+                            <canvas id="wbsBudgetChart" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gantt Chart -->
+                <div class="bg-white p-6 rounded-xl shadow-lg mb-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                        📅 الجدول الزمني (Gantt Chart)
+                    </h3>
+                    <div class="wbs-gantt-container" id="wbsGanttChart">
+                        <!-- Gantt timeline will be rendered here -->
+                    </div>
+                </div>
+
+                <!-- WBS Table -->
+                <div class="bg-white p-6 rounded-xl shadow-lg mb-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">قائمة حزم العمل</h3>
+                    <div class="overflow-x-auto max-h-96 overflow-y-auto">
+                        <table class="w-full text-sm text-right">
+                            <thead class="bg-gray-100 border-b-2 border-gray-300">
+                                <tr>
+                                    <th class="px-4 py-3">رقم</th>
+                                    <th class="px-4 py-3">اسم الحزمة</th>
+                                    <th class="px-4 py-3">الوصف</th>
+                                    <th class="px-4 py-3">المالك</th>
+                                    <th class="px-4 py-3">الحالة</th>
+                                    <th class="px-4 py-3">المهام</th>
+                                    <th class="px-4 py-3">إجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="wbsTableBody">
+                                <!-- WBS items will be rendered here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- WBS Tree View -->
+                <div class="bg-white p-6 rounded-xl shadow-lg mb-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">عرض الهيكل الشجري</h3>
+                    <div id="wbsTreeView" class="space-y-3 max-h-96 overflow-y-auto">
+                        <!-- Tree view will be rendered here -->
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="mt-8 text-center">
+                    <button onclick="closeWBSModalDirect()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-lg font-bold transition">
+                        حفظ والعودة للصفحة الرئيسية
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add WBS Modal -->
+    <div id="addWBSModal" class="modal-overlay" onclick="closeAddWBSModal(event)">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-xl shadow-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+                <h3 class="text-xl font-bold text-gray-800 mb-6">إضافة حزمة عمل جديدة</h3>
+                <form id="addWBSForm" onsubmit="addWBSItem(event)">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">اسم الحزمة</label>
+                            <input type="text" id="wbsName" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500" placeholder="مثال: تجهيز المكان" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">الوصف</label>
+                            <textarea id="wbsDescription" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500" rows="3" placeholder="وصف تفصيلي للحزمة..."></textarea>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">المالك</label>
+                                <input type="text" id="wbsOwner" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500" placeholder="المسؤول" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">الحالة</label>
+                                <select id="wbsStatus" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500">
+                                    <option value="pending">قيد الانتظار</option>
+                                    <option value="in-progress">جاري التنفيذ</option>
+                                    <option value="completed">مكتملة</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">المهام الفرعية (مفصولة بفواصل)</label>
+                            <textarea id="wbsTasks" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500" rows="3" placeholder="مهمة 1, مهمة 2, مهمة 3"></textarea>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">المدة (أيام)</label>
+                                <input type="number" id="wbsDuration" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500" min="1" value="1" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">الميزانية</label>
+                                <input type="number" id="wbsBudget" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500" min="0" value="0">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex gap-4 mt-6">
+                        <button type="submit" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-bold transition">إضافة</button>
+                        <button type="button" onclick="closeAddWBSModalDirect()" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded-lg font-bold transition">إلغاء</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit WBS Modal -->
+    <div id="editWBSModal" class="modal-overlay" onclick="closeEditWBSModal(event)">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-xl shadow-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+                <h3 class="text-xl font-bold text-gray-800 mb-6">تعديل حزمة العمل</h3>
+                <form id="editWBSForm" onsubmit="saveEditWBS(event)">
+                    <input type="hidden" id="editWBSIndex">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">اسم الحزمة</label>
+                            <input type="text" id="editWBSName" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">الوصف</label>
+                            <textarea id="editWBSDescription" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500" rows="3"></textarea>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">المالك</label>
+                                <input type="text" id="editWBSOwner" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">الحالة</label>
+                                <select id="editWBSStatus" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500">
+                                    <option value="pending">قيد الانتظار</option>
+                                    <option value="in-progress">جاري التنفيذ</option>
+                                    <option value="completed">مكتملة</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">المهام الفرعية (مفصولة بفواصل)</label>
+                            <textarea id="editWBSTasks" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500" rows="3"></textarea>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">المدة (أيام)</label>
+                                <input type="number" id="editWBSDuration" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500" min="1" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">الميزانية</label>
+                                <input type="number" id="editWBSBudget" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-emerald-500" min="0">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex gap-4 mt-6">
+                        <button type="submit" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-bold transition">حفظ</button>
+                        <button type="button" onclick="closeEditWBSModalDirect()" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded-lg font-bold transition">إلغاء</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="rtmModal" class="modal-overlay" onclick="closeRTMModal(event)">
+        <div class="modal-content w-full bg-gray-50 overflow-y-auto max-h-screen">
+            <div class="container mx-auto px-4 py-8 max-w-7xl">
+                <!-- Modal Header -->
+                <div class="flex justify-between items-center mb-8 bg-white p-6 rounded-xl shadow-lg sticky top-0 z-50">
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-800">مصفوفة تتبع المتطلبات (RTM)</h2>
+                        <p class="text-gray-500 mt-1">إدارة وتتبع متطلبات المشروع - قابلة للإضافة والحذف والتعديل</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="openAddRTMModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-bold transition flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                            </svg>
+                            إضافة متطلب
+                        </button>
+                        <button onclick="closeRTMModalDirect()" class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg font-bold transition flex items-center gap-2">إغلاق</button>
+                    </div>
+                </div>
+
+                <!-- RTM Stats -->
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+                    <div class="stats-card bg-white p-4 rounded-xl shadow-sm border-r-4 border-emerald-500">
+                        <p class="text-sm text-gray-500">إجمالي المتطلبات</p>
+                        <p class="text-2xl font-bold text-emerald-600" id="rtmTotalCount">0</p>
+                    </div>
+                    <div class="stats-card bg-white p-4 rounded-xl shadow-sm border-r-4 border-blue-500">
+                        <p class="text-sm text-gray-500">مكتملة</p>
+                        <p class="text-2xl font-bold text-blue-600" id="rtmCompletedCount">0</p>
+                    </div>
+                    <div class="stats-card bg-white p-4 rounded-xl shadow-sm border-r-4 border-orange-500">
+                        <p class="text-sm text-gray-500">جاري التنفيذ</p>
+                        <p class="text-2xl font-bold text-orange-600" id="rtmInProgressCount">0</p>
+                    </div>
+                    <div class="stats-card bg-white p-4 rounded-xl shadow-sm border-r-4 border-yellow-500">
+                        <p class="text-sm text-gray-500">قيد الانتظار</p>
+                        <p class="text-2xl font-bold text-yellow-600" id="rtmPendingCount">0</p>
+                    </div>
+                    <div class="stats-card bg-white p-4 rounded-xl shadow-sm border-r-4 border-red-500">
+                        <p class="text-sm text-gray-500">أولوية عالية</p>
+                        <p class="text-2xl font-bold text-red-600" id="rtmHighPriorityCount">0</p>
+                    </div>
+                </div>
+
+                <!-- Search & Filter -->
+                <div class="bg-white p-6 rounded-xl shadow-lg mb-6">
+                    <div class="flex flex-col md:flex-row gap-4 items-center mb-4">
+                        <div class="relative flex-1">
+                            <input type="text" id="rtmSearch" oninput="renderRTMModal()" placeholder="بحث عن متطلب..." class="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none">
+                            <svg class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </div>
+                        <select id="rtmStatusFilter" onchange="renderRTMModal()" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none">
+                            <option value="">جميع الحالات</option>
+                            <option value="pending">قيد الانتظار</option>
+                            <option value="in-progress">جاري التنفيذ</option>
+                            <option value="completed">مكتملة</option>
+                        </select>
+                        <select id="rtmPriorityFilter" onchange="renderRTMModal()" class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none">
+                            <option value="">جميع الأولويات</option>
+                            <option value="high">عالية</option>
+                            <option value="medium">متوسطة</option>
+                            <option value="low">منخفضة</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- RTM Table -->
+                <div class="bg-white p-6 rounded-xl shadow-lg mb-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">قائمة المتطلبات</h3>
+                    <div class="overflow-x-auto max-h-96 overflow-y-auto">
+                        <table class="w-full text-sm text-right">
+                            <thead class="bg-gray-100 border-b-2 border-gray-300 sticky top-0">
+                                <tr>
+                                    <th class="px-4 py-3">رقم</th>
+                                    <th class="px-4 py-3">اسم المتطلب</th>
+                                    <th class="px-4 py-3">الوصف</th>
+                                    <th class="px-4 py-3">الربط مع WBS</th>
+                                    <th class="px-4 py-3">الأولوية</th>
+                                    <th class="px-4 py-3">الحالة</th>
+                                    <th class="px-4 py-3">إجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rtmTableBody">
+                                <!-- RTM items will be rendered here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- RTM Cards View -->
+                <div class="bg-white p-6 rounded-xl shadow-lg mb-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">عرض البطاقات</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="rtmCardsView">
+                        <!-- RTM cards will be rendered here -->
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="mt-8 text-center">
+                    <button onclick="closeRTMModalDirect()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-lg font-bold transition">
+                        حفظ والعودة للصفحة الرئيسية
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add RTM Modal -->
+    <div id="addRTMModal" class="modal-overlay" onclick="closeAddRTMModal(event)">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-xl shadow-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+                <h3 class="text-xl font-bold text-gray-800 mb-6">إضافة متطلب جديد</h3>
+                <form id="addRTMForm" onsubmit="addRTMItem(event)">
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">معرف المتطلب (ID)</label>
+                                <input type="text" id="rtmId" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none" placeholder="RQ-06" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">الأولوية</label>
+                                <select id="rtmPriority" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none">
+                                    <option value="high">عالية</option>
+                                    <option value="medium" selected>متوسطة</option>
+                                    <option value="low">منخفضة</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">اسم المتطلب</label>
+                            <input type="text" id="rtmName" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none" placeholder="مثال: الزهور" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">الوصف</label>
+                            <textarea id="rtmDescription" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none" rows="3" placeholder="وصف تفصيلي للمتطلب" required></textarea>
+                        </div>
+                        <div class="grid grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">الربط مع WBS</label>
+                                <select id="rtmWBSLink" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none">
+                                    <option value="WBS-1">WBS-1 (تجهيز المكان)</option>
+                                    <option value="WBS-2">WBS-2 (الدعوات)</option>
+                                    <option value="WBS-3">WBS-3 (الضيافة)</option>
+                                    <option value="WBS-4">WBS-4 (التجهيز الشخصي)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">الحالة</label>
+                                <select id="rtmStatus" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none">
+                                    <option value="pending">قيد الانتظار</option>
+                                    <option value="in-progress">جاري التنفيذ</option>
+                                    <option value="completed">مكتملة</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">المالك</label>
+                                <input type="text" id="rtmOwner" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none" placeholder="المسؤول" required>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">تاريخ البداية</label>
+                                <input type="date" id="rtmStartDate" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">تاريخ النهاية</label>
+                                <input type="date" id="rtmEndDate" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex gap-4 mt-6">
+                        <button type="submit" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-bold transition">إضافة</button>
+                        <button type="button" onclick="closeAddRTMModalDirect()" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded-lg font-bold transition">إلغاء</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit RTM Modal -->
+    <div id="editRTMModal" class="modal-overlay" onclick="closeEditRTMModal(event)">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-xl shadow-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+                <h3 class="text-xl font-bold text-gray-800 mb-6">تعديل متطلب</h3>
+                <form id="editRTMForm" onsubmit="saveEditRTM(event)">
+                    <input type="hidden" id="editRTMIndex">
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">معرف المتطلب (ID)</label>
+                                <input type="text" id="editRTMId" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none" disabled>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">الأولوية</label>
+                                <select id="editRTMPriority" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none">
+                                    <option value="high">عالية</option>
+                                    <option value="medium">متوسطة</option>
+                                    <option value="low">منخفضة</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">اسم المتطلب</label>
+                            <input type="text" id="editRTMName" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">الوصف</label>
+                            <textarea id="editRTMDescription" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none" rows="3" required></textarea>
+                        </div>
+                        <div class="grid grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">الربط مع WBS</label>
+                                <select id="editRTMWBSLink" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none">
+                                    <option value="WBS-1">WBS-1 (تجهيز المكان)</option>
+                                    <option value="WBS-2">WBS-2 (الدعوات)</option>
+                                    <option value="WBS-3">WBS-3 (الضيافة)</option>
+                                    <option value="WBS-4">WBS-4 (التجهيز الشخصي)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">الحالة</label>
+                                <select id="editRTMStatus" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none">
+                                    <option value="pending">قيد الانتظار</option>
+                                    <option value="in-progress">جاري التنفيذ</option>
+                                    <option value="completed">مكتملة</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">المالك</label>
+                                <input type="text" id="editRTMOwner" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none" required>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">تاريخ البداية</label>
+                                <input type="date" id="editRTMStartDate" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">تاريخ النهاية</label>
+                                <input type="date" id="editRTMEndDate" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex gap-4 mt-6">
+                        <button type="submit" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-bold transition">حفظ</button>
+                        <button type="button" onclick="closeEditRTMModalDirect()" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded-lg font-bold transition">إلغاء</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="estimationModal" class="modal-overlay" onclick="closeEstimationModal(event)">
+        <div class="modal-content w-full bg-gray-50 overflow-y-auto max-h-screen">
+            <div class="container mx-auto px-4 py-8 max-w-6xl">
+                <div class="flex justify-between items-center mb-8 bg-white p-6 rounded-xl shadow-lg sticky top-0 z-50">
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-800">التقدير والجدولة</h2>
+                        <p class="text-gray-500 mt-1">إدارة تقديرات المشروع</p>
+                    </div>
+                    <button onclick="closeEstimationModalDirect()" class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg font-bold transition flex items-center gap-2">إغلاق</button>
+                </div>
+                <div class="bg-white p-12 rounded-xl shadow-lg text-center">
+                    <div class="text-6xl mb-4">⏱️</div>
+                    <h3 class="text-xl font-bold text-gray-700 mb-2">صفحة التقدير والجدولة</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="stakeholderModal" class="modal-overlay" onclick="closeStakeholderModal(event)">
+        <div class="modal-content w-full bg-gray-50 overflow-y-auto max-h-screen">
+            <div class="container mx-auto px-4 py-8 max-w-5xl">
+                <div class="flex justify-between items-center mb-8 bg-white p-6 rounded-xl shadow-lg">
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-800">أصحاب المصلحة</h2>
+                    </div>
+                    <button onclick="closeStakeholderModalDirect()" class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg font-bold transition">إغلاق</button>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg mb-8">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">مصفوفة القوة/المصلحة</h3>
+                    <div class="power-interest-grid max-w-md mx-auto">
+                        <div class="power-interest-cell high-high"><div class="font-bold text-gray-800 mb-2">قوة عالية / مصلحة عالية</div><div class="text-xs text-gray-600">إدارة عن كثب</div></div>
+                        <div class="power-interest-cell high-low"><div class="font-bold text-gray-800 mb-2">قوة عالية / مصلحة منخفضة</div><div class="text-xs text-gray-600">إبقاء راضين</div></div>
+                        <div class="power-interest-cell low-high"><div class="font-bold text-gray-800 mb-2">قوة منخفضة / مصلحة عالية</div><div class="text-xs text-gray-600">إبقاء مطلعين</div></div>
+                        <div class="power-interest-cell low-low"><div class="font-bold text-gray-800 mb-2">قوة منخفضة / مصلحة منخفضة</div><div class="text-xs text-gray-600">مراقبة</div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="planningModal" class="modal-overlay" onclick="closePlanningModal(event)">
+        <div class="modal-content w-full bg-gray-50 overflow-y-auto max-h-screen">
+            <div class="container mx-auto px-4 py-8 max-w-5xl">
+                <div class="flex justify-between items-center mb-8 bg-white p-6 rounded-xl shadow-lg">
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-800">التخطيط</h2>
+                    </div>
+                    <button onclick="closePlanningModalDirect()" class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg font-bold transition">إغلاق</button>
+                </div>
+                <div class="bg-white p-12 rounded-xl shadow-lg text-center">
+                    <div class="text-6xl mb-4">📋</div>
+                    <h3 class="text-xl font-bold text-gray-700 mb-2">صفحة التخطيط</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-gray-800 text-gray-400 py-8 text-center text-sm">
+        <p>تم إعداد ملف المشروع بواسطة مساعد الذكاء الاصطناعي لعبدالله</p>
+        <p class="mt-2 text-xs">PMP Standard • PMBOK 7th Edition</p>
+    </footer>
+
+    <script>
+        // RTM Data Storage
+        let rtmData = [
+            { id: 'RQ-01', name: 'القاعة', description: 'حجز قاعة تتسع لـ 300 شخص', wbsLink: 'WBS-1', priority: 'high', status: 'completed', owner: 'والد العريس', startDate: '2024-01-10', endDate: '2024-01-12' },
+            { id: 'RQ-02', name: 'الكوشة', description: 'تصميم كوشة بيضاء فاخرة', wbsLink: 'WBS-1', priority: 'high', status: 'completed', owner: 'شركة الديكور', startDate: '2024-01-11', endDate: '2024-01-14' },
+            { id: 'RQ-03', name: 'الإضاءة', description: 'إضاءة LED مناسبة للتصوير الفوتوغرافي', wbsLink: 'WBS-1', priority: 'medium', status: 'completed', owner: 'فريق الإضاءة', startDate: '2024-01-13', endDate: '2024-01-15' },
+            { id: 'RQ-04', name: 'الدعوات', description: 'تصميم وطباعة 200 دعوة', wbsLink: 'WBS-2', priority: 'high', status: 'completed', owner: 'العريس', startDate: '2024-01-05', endDate: '2024-01-10' },
+            { id: 'RQ-05', name: 'الطعام', description: 'تجهيز وجبات عشاء فاخرة لـ 300 شخص', wbsLink: 'WBS-3', priority: 'high', status: 'in-progress', owner: 'محمد سالم', startDate: '2024-01-14', endDate: '2024-01-19' }
+        ];
+
+        let risksData = [
+            { id: 'R-01', name: 'تأخر الكوشة', probability: 3, impact: 5, level: 15, levelLabel: 'high', response: 'زيادة العمال + متابعة يومية', responseType: 'mitigate', owner: 'شركة الديكور', reviewDate: '2024-01-18' },
+            { id: 'R-02', name: 'تأخر الدعوات', probability: 4, impact: 3, level: 12, levelLabel: 'high', response: 'استعجال الطباعة + بديل', responseType: 'mitigate', owner: 'العريس', reviewDate: '2024-01-15' },
+            { id: 'R-03', name: 'عطل الإضاءة', probability: 2, impact: 5, level: 10, levelLabel: 'medium', response: 'فني احتياط', responseType: 'mitigate', owner: 'فريق الإضاءة', reviewDate: '2024-01-19' },
+            { id: 'R-04', name: 'سوء الأحوال الجوية', probability: 3, impact: 5, level: 15, levelLabel: 'high', response: 'خيمة احتياط', responseType: 'mitigate', owner: 'إدارة القاعة', reviewDate: '2024-01-20' },
+            { id: 'R-05', name: 'زحمة المواقف', probability: 4, impact: 3, level: 12, levelLabel: 'high', response: 'تنسيق مع الأمن', responseType: 'mitigate', owner: 'الأمن', reviewDate: '2024-01-20' }
+        ];
+
+        // WBS Data Storage
+        let wbsData = [
+            {
+                id: 'WBS-1',
+                name: 'تجهيز المكان',
+                description: 'جميع الأعمال المتعلقة بتجهيز مكان الحفل',
+                owner: 'علي محمد',
+                status: 'in-progress',
+                duration: 3,
+                budget: 15000,
+                tasks: ['حجز القاعة', 'تجهيز الكوشة', 'الإضاءة والصوت']
+            },
+            {
+                id: 'WBS-2',
+                name: 'الدعوات',
+                description: 'تصميم وطباعة وتوزيع الدعوات',
+                owner: 'فاطمة أحمد',
+                status: 'completed',
+                duration: 2,
+                budget: 2000,
+                tasks: ['تصميم الدعوات', 'طباعة الدعوات', 'توزيع الدعوات']
+            },
+            {
+                id: 'WBS-3',
+                name: 'الضيافة',
+                description: 'تنظيم وإعداد الطعام والشراب',
+                owner: 'محمد سالم',
+                status: 'pending',
+                duration: 4,
+                budget: 12000,
+                tasks: ['اختيار قائمة الطعام', 'تجربة الطعام', 'تجهيز البوفيه']
+            },
+            {
+                id: 'WBS-4',
+                name: 'التجهيز الشخصي',
+                description: 'تجهيز العريس والعروس',
+                owner: 'أم العريس',
+                status: 'pending',
+                duration: 1,
+                budget: 5000,
+                tasks: ['العروس (مكياج، شعر، فستان)', 'العريس (بدلة، حلاقة)']
+            }
+        ];
+
+        let currentRiskFilter = 'all';
+        let riskSearchQuery = '';
+        let riskChart = null;
+
+        const riskLevelMap = {
+            critical: { label: 'حرجة', class: 'risk-badge-critical', score: '20-25' },
+            high: { label: 'عالية', class: 'risk-badge-high', score: '12-16' },
+            medium: { label: 'متوسطة', class: 'risk-badge-medium', score: '6-9' },
+            low: { label: 'منخفضة', class: 'risk-badge-low', score: '1-4' }
+        };
+
+        const statusMap = {
+            pending: { label: 'قيد الانتظار', class: 'bg-yellow-100 text-yellow-800', color: 'yellow' },
+            'in-progress': { label: 'جاري التنفيذ', class: 'bg-blue-100 text-blue-800', color: 'blue' },
+            completed: { label: 'مكتملة', class: 'bg-green-100 text-green-800', color: 'green' }
+        };
+
+        function toggleMobileNav() {
+            const nav = document.querySelector('.sidebar-nav');
+            const overlay = document.getElementById('mobileNavOverlay');
+            nav.classList.toggle('open');
+            overlay.classList.toggle('hidden');
+        }
+
+        function scrollToSection(event, sectionId) {
+            event.preventDefault();
+            const section = document.getElementById(sectionId);
+            if (section) {
+                const headerOffset = 100;
+                const elementPosition = section.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+                section.classList.add('section-highlight');
+                setTimeout(() => section.classList.remove('section-highlight'), 1000);
+                if (window.innerWidth < 1024) toggleMobileNav();
+            }
+        }
+
+        function updateActiveNavLink() {
+            const sections = document.querySelectorAll('.section-content, #home');
+            const navLinks = document.querySelectorAll('.nav-link');
+            let currentSection = '';
+            const scrollPosition = window.scrollY + 150;
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.offsetHeight;
+                if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
+                    currentSection = section.getAttribute('id');
+                }
+            });
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + currentSection) {
+                    link.classList.add('active');
+                }
+            });
+        }
+
+        window.addEventListener('scroll', updateActiveNavLink);
+
+        window.addEventListener('load', () => {
+            updateActiveNavLink();
+            renderWBS();
+            renderRTM();
+            renderRisks();
+        });
+
+        function renderWBS() {
+            const container = document.getElementById('wbsContainer');
+            if (!container) return;
+            
+            const colorMap = {
+                emerald: 'border-emerald-500 text-emerald-800',
+                blue: 'border-blue-500 text-blue-800',
+                purple: 'border-purple-500 text-purple-800',
+                pink: 'border-pink-500 text-pink-800',
+                orange: 'border-orange-500 text-orange-800'
+            };
+            
+            const colors = ['emerald', 'blue', 'purple', 'pink', 'orange'];
+            
+            const totalBudget = wbsData.reduce((sum, item) => sum + item.budget, 0);
+            
+            container.innerHTML = wbsData.map((item, index) => {
+                const color = colors[index % colors.length];
+                const budgetPercentage = totalBudget > 0 ? (item.budget / totalBudget * 100).toFixed(1) : 0;
+                const taskCompletionPercentage = item.tasks.length > 0 ? 0 : 0; // Can be enhanced
+                
+                return `
+                    <div class="wbs-node bg-white p-5 rounded-lg border-r-4 ${colorMap[color]} shadow-sm hover:shadow-md transition">
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="flex-1">
+                                <h4 class="font-bold ${colorMap[color]} text-lg">${item.name}</h4>
+                                <p class="text-xs text-gray-500 mt-1">${item.id}</p>
+                            </div>
+                            <span class="${statusMap[item.status].class} text-xs px-3 py-1 rounded-full font-semibold">${statusMap[item.status].label}</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-3 line-clamp-2">${item.description}</p>
+                        
+                        <div class="bg-gray-50 p-3 rounded-lg mb-3">
+                            <h5 class="text-xs font-bold text-gray-700 mb-2 uppercase">المهام الفرعية</h5>
+                            <ul class="space-y-1">
+                                ${item.tasks.slice(0, 3).map(task => `<li class="text-xs text-gray-600 flex items-center gap-2"><span class="text-emerald-500">✓</span> ${task}</li>`).join('')}
+                                ${item.tasks.length > 3 ? `<li class="text-xs text-gray-500 italic">+ ${item.tasks.length - 3} مهام أخرى</li>` : ''}
+                            </ul>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-3 text-xs mb-3">
+                            <div class="bg-blue-50 p-2 rounded">
+                                <span class="text-gray-500 block">المدة</span>
+                                <span class="font-bold text-blue-600">${item.duration} يوم</span>
+                            </div>
+                            <div class="bg-green-50 p-2 rounded">
+                                <span class="text-gray-500 block">الميزانية</span>
+                                <span class="font-bold text-green-600">${item.budget.toLocaleString('ar-SA')} ر.س</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center justify-between text-xs text-gray-600 border-t pt-2">
+                            <span>المالك: <strong>${item.owner}</strong></span>
+                            <span class="badge-secondary px-2 py-1 bg-orange-100 text-orange-700 rounded">${budgetPercentage}% من الميزانية</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderWBSModal() {
+            const tableBody = document.getElementById('wbsTableBody');
+            const treeView = document.getElementById('wbsTreeView');
+            const ganttContainer = document.getElementById('wbsGanttChart');
+            
+            // Update stats
+            const totalPackages = wbsData.length;
+            const totalTasks = wbsData.reduce((sum, item) => sum + item.tasks.length, 0);
+            const completedTasks = wbsData.filter(item => item.status === 'completed').reduce((sum, item) => sum + item.tasks.length, 0);
+            const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+            const totalBudget = wbsData.reduce((sum, item) => sum + item.budget, 0);
+            const totalDuration = wbsData.reduce((sum, item) => sum + item.duration, 0);
+            
+            document.getElementById('wbsTotalPackages').textContent = totalPackages;
+            document.getElementById('wbsTotalTasks').textContent = totalTasks;
+            document.getElementById('wbsCompletedTasks').textContent = completedTasks;
+            document.getElementById('wbsCompletionRate').textContent = completionRate + '%';
+            document.getElementById('wbsTotalBudget').textContent = totalBudget.toLocaleString('ar-SA');
+            document.getElementById('wbsTotalDuration').textContent = totalDuration;
+
+            // Calculate status distribution
+            const statusPending = wbsData.filter(item => item.status === 'pending').length;
+            const statusInProgress = wbsData.filter(item => item.status === 'in-progress').length;
+            const statusCompleted = wbsData.filter(item => item.status === 'completed').length;
+            
+            document.getElementById('wbsStatusPending').textContent = statusPending;
+            document.getElementById('wbsStatusInProgress').textContent = statusInProgress;
+            document.getElementById('wbsStatusCompleted').textContent = statusCompleted;
+            
+            if (totalPackages > 0) {
+                document.getElementById('wbsStatusPendingBar').style.width = (statusPending / totalPackages * 100) + '%';
+                document.getElementById('wbsStatusInProgressBar').style.width = (statusInProgress / totalPackages * 100) + '%';
+                document.getElementById('wbsStatusCompletedBar').style.width = (statusCompleted / totalPackages * 100) + '%';
+            }
+
+            // Render Budget Distribution Chart
+            renderWBSBudgetChart();
+
+            // Table view
+            tableBody.innerHTML = wbsData.map((item, index) => `
+                <tr class="bg-white border-b hover:bg-gray-50 editable-item">
+                    <td class="px-4 py-3 font-medium">${index + 1}</td>
+                    <td class="px-4 py-3 font-bold text-gray-800">${item.name}</td>
+                    <td class="px-4 py-3 text-sm text-gray-600">${item.description.substring(0, 50)}...</td>
+                    <td class="px-4 py-3">${item.owner}</td>
+                    <td class="px-4 py-3"><span class="${statusMap[item.status].class} text-xs px-2 py-1 rounded">${statusMap[item.status].label}</span></td>
+                    <td class="px-4 py-3 text-center"><span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">${item.tasks.length}</span></td>
+                    <td class="px-4 py-3">
+                        <div class="flex gap-2">
+                            <button onclick="openEditWBSModal(${index})" class="edit-btn bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs transition">تعديل</button>
+                            <button onclick="deleteWBSItem(${index})" class="delete-btn bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs transition">حذف</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+
+            // Render Gantt Chart
+            ganttContainer.innerHTML = wbsData.map((item, index) => {
+                const daysPerWeek = 7;
+                const barWidth = (item.duration / totalDuration * 100).toFixed(1);
+                const statusColor = item.status;
+                return `
+                    <div class="gantt-timeline">
+                        <div class="gantt-label">${item.name}</div>
+                        <div class="gantt-bar-container">
+                            <div class="gantt-bar gantt-bar-${statusColor}" style="width: ${barWidth}%">
+                                ${item.duration} يوم
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Tree view
+            treeView.innerHTML = wbsData.map((item, index) => {
+                const budgetPercentage = totalBudget > 0 ? (item.budget / totalBudget * 100).toFixed(1) : 0;
+                return `
+                    <div class="bg-gradient-to-r from-blue-50 to-green-50 p-4 rounded-lg border-r-4 ${['border-emerald-500', 'border-blue-500', 'border-purple-500', 'border-pink-500', 'border-orange-500'][index % 5]} hover:shadow-md transition">
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2">
+                                    <h4 class="font-bold text-gray-800">${item.name}</h4>
+                                    ${item.status === 'in-progress' ? '<span class="wbs-critical-indicator"></span>' : ''}
+                                </div>
+                                <p class="text-xs text-gray-600 mt-1">المالك: <span class="font-semibold">${item.owner}</span></p>
+                            </div>
+                            <span class="${statusMap[item.status].class} text-xs px-2 py-1 rounded">${statusMap[item.status].label}</span>
+                        </div>
+                        <div class="ml-4 space-y-2 mb-3">
+                            ${item.tasks.map((task, taskIndex) => `
+                                <div class="flex items-center gap-2 text-sm text-gray-700">
+                                    <span class="text-emerald-600">└─</span>
+                                    <span>${taskIndex + 1}. ${task}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="grid grid-cols-3 gap-3 text-xs bg-white p-3 rounded border border-gray-200">
+                            <div class="text-center">
+                                <span class="text-gray-500 block">المدة</span>
+                                <span class="font-bold text-blue-600">${item.duration} يوم</span>
+                            </div>
+                            <div class="text-center">
+                                <span class="text-gray-500 block">الميزانية</span>
+                                <span class="font-bold text-green-600">${item.budget.toLocaleString('ar-SA')} ر.س</span>
+                            </div>
+                            <div class="text-center">
+                                <span class="text-gray-500 block">نسبة الميزانية</span>
+                                <span class="font-bold text-orange-600">${budgetPercentage}%</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderWBSBudgetChart() {
+            const ctx = document.getElementById('wbsBudgetChart');
+            if (!ctx) return;
+            
+            const labels = wbsData.map(item => item.name);
+            const budgets = wbsData.map(item => item.budget);
+            const colors = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
+            
+            if (window.wbsBudgetChartInstance) {
+                window.wbsBudgetChartInstance.destroy();
+            }
+            
+            window.wbsBudgetChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: budgets,
+                        backgroundColor: colors.slice(0, labels.length),
+                        borderColor: 'white',
+                        borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: { family: "'Cairo', sans-serif", size: 12 },
+                                padding: 15,
+                                usePointStyle: true
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function addWBSItem(event) {
+            event.preventDefault();
+            
+            const newId = 'WBS-' + (wbsData.length + 1);
+            const container = document.getElementById('wbsContainer');
+            const colorMap = {
+                emerald: 'border-emerald-500 text-emerald-800',
+                blue: 'border-blue-500 text-blue-800',
+                purple: 'border-purple-500 text-purple-800',
+                pink: 'border-pink-500 text-pink-800',
+                orange: 'border-orange-500 text-orange-800'
+            };
+            
+            const colors = ['emerald', 'blue', 'purple', 'pink', 'orange'];
+            
+            container.innerHTML = wbsData.map((item, index) => {
+                const color = colors[index % colors.length];
+                return `
+                    <div class="wbs-node bg-white p-4 rounded-lg border-r-4 ${colorMap[color]} shadow-sm">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold ${colorMap[color]}">${item.name}</h4>
+                            <span class="${statusMap[item.status].class} text-xs px-2 py-1 rounded">${statusMap[item.status].label}</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-2">${item.description}</p>
+                        <ul class="list-disc list-inside text-gray-600 text-sm space-y-1 mr-4 mb-3">
+                            ${item.tasks.map(task => `<li>${task}</li>`).join('')}
+                        </ul>
+                        <div class="flex justify-between items-center text-xs text-gray-500">
+                            <span>المدة: ${item.duration} أيام</span>
+                            <span>المالك: ${item.owner}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // WBS Modal Functions
+        function openWBSModal() {
+            document.getElementById('wbsModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+            renderWBSModal();
+        }
+
+        function closeWBSModal(event) {
+            if (event.target === document.getElementById('wbsModal')) {
+                closeWBSModalDirect();
+            }
+        }
+
+        function closeWBSModalDirect() {
+            document.getElementById('wbsModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+            renderWBS();
+        }
+
+        function openAddWBSModal() {
+            document.getElementById('addWBSModal').classList.add('active');
+        }
+
+        function closeAddWBSModal(event) {
+            if (event.target === document.getElementById('addWBSModal')) {
+                closeAddWBSModalDirect();
+            }
+        }
+
+        function closeAddWBSModalDirect() {
+            document.getElementById('addWBSModal').classList.remove('active');
+            document.getElementById('addWBSForm').reset();
+        }
+
+        function openEditWBSModal(index) {
+            const item = wbsData[index];
+            document.getElementById('editWBSIndex').value = index;
+            document.getElementById('editWBSName').value = item.name;
+            document.getElementById('editWBSDescription').value = item.description;
+            document.getElementById('editWBSOwner').value = item.owner;
+            document.getElementById('editWBSStatus').value = item.status;
+            document.getElementById('editWBSTasks').value = item.tasks.join(', ');
+            document.getElementById('editWBSDuration').value = item.duration;
+            document.getElementById('editWBSBudget').value = item.budget;
+            document.getElementById('editWBSModal').classList.add('active');
+        }
+
+        function closeEditWBSModal(event) {
+            if (event.target === document.getElementById('editWBSModal')) {
+                closeEditWBSModalDirect();
+            }
+        }
+
+        function closeEditWBSModalDirect() {
+            document.getElementById('editWBSModal').classList.remove('active');
+        }
+
+        function renderWBSModal() {
+            const tableBody = document.getElementById('wbsTableBody');
+            const treeView = document.getElementById('wbsTreeView');
+            
+            // Update stats
+            const totalPackages = wbsData.length;
+            const totalTasks = wbsData.reduce((sum, item) => sum + item.tasks.length, 0);
+            const completedTasks = wbsData.filter(item => item.status === 'completed').reduce((sum, item) => sum + item.tasks.length, 0);
+            const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+            
+            document.getElementById('wbsTotalPackages').textContent = totalPackages;
+            document.getElementById('wbsTotalTasks').textContent = totalTasks;
+            document.getElementById('wbsCompletedTasks').textContent = completedTasks;
+            document.getElementById('wbsCompletionRate').textContent = completionRate + '%';
+
+            // Table view
+            tableBody.innerHTML = wbsData.map((item, index) => `
+                <tr class="bg-white border-b hover:bg-gray-50 editable-item">
+                    <td class="px-4 py-3 font-medium">${index + 1}</td>
+                    <td class="px-4 py-3 font-bold text-gray-800">${item.name}</td>
+                    <td class="px-4 py-3 text-sm text-gray-600">${item.description.substring(0, 50)}...</td>
+                    <td class="px-4 py-3">${item.owner}</td>
+                    <td class="px-4 py-3"><span class="${statusMap[item.status].class} text-xs px-2 py-1 rounded">${statusMap[item.status].label}</span></td>
+                    <td class="px-4 py-3 text-center"><span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">${item.tasks.length}</span></td>
+                    <td class="px-4 py-3">
+                        <div class="flex gap-2">
+                            <button onclick="openEditWBSModal(${index})" class="edit-btn bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs transition">تعديل</button>
+                            <button onclick="deleteWBSItem(${index})" class="delete-btn bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs transition">حذف</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+
+            // Tree view
+            treeView.innerHTML = wbsData.map((item, index) => `
+                <div class="bg-gray-50 p-4 rounded-lg border-r-4 ${['border-emerald-500', 'border-blue-500', 'border-purple-500', 'border-pink-500', 'border-orange-500'][index % 5]}">
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <h4 class="font-bold text-gray-800">${item.name}</h4>
+                            <p class="text-xs text-gray-500">المالك: ${item.owner}</p>
+                        </div>
+                        <span class="${statusMap[item.status].class} text-xs px-2 py-1 rounded">${statusMap[item.status].label}</span>
+                    </div>
+                    <div class="ml-4 space-y-2">
+                        ${item.tasks.map((task, taskIndex) => `
+                            <div class="flex items-center gap-2 text-sm text-gray-700">
+                                <span class="text-emerald-600">└─</span>
+                                <span>${taskIndex + 1}. ${task}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="flex gap-2 mt-3 text-xs text-gray-600">
+                        <span>المدة: ${item.duration} يوم</span>
+                        <span>•</span>
+                        <span>الميزانية: ${item.budget.toLocaleString()} ر.س</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function addWBSItem(event) {
+            event.preventDefault();
+            
+            const newId = 'WBS-' + (wbsData.length + 1);
+            const tasks = document.getElementById('wbsTasks').value.split(',').map(t => t.trim()).filter(t => t);
+            
+            wbsData.push({
+                id: newId,
+                name: document.getElementById('wbsName').value,
+                description: document.getElementById('wbsDescription').value,
+                owner: document.getElementById('wbsOwner').value,
+                status: document.getElementById('wbsStatus').value,
+                duration: parseInt(document.getElementById('wbsDuration').value),
+                budget: parseInt(document.getElementById('wbsBudget').value) || 0,
+                tasks: tasks.length > 0 ? tasks : ['المهمة الرئيسية']
+            });
+            
+            closeAddWBSModalDirect();
+            renderWBSModal();
+            renderWBS();
+        }
+
+        function saveEditWBS(event) {
+            event.preventDefault();
+            
+            const index = parseInt(document.getElementById('editWBSIndex').value);
+            const tasks = document.getElementById('editWBSTasks').value.split(',').map(t => t.trim()).filter(t => t);
+            
+            wbsData[index] = {
+                id: wbsData[index].id,
+                name: document.getElementById('editWBSName').value,
+                description: document.getElementById('editWBSDescription').value,
+                owner: document.getElementById('editWBSOwner').value,
+                status: document.getElementById('editWBSStatus').value,
+                duration: parseInt(document.getElementById('editWBSDuration').value),
+                budget: parseInt(document.getElementById('editWBSBudget').value) || 0,
+                tasks: tasks.length > 0 ? tasks : ['المهمة الرئيسية']
+            };
+            
+            closeEditWBSModalDirect();
+            renderWBSModal();
+            renderWBS();
+        }
+
+        function deleteWBSItem(index) {
+            if (confirm('هل أنت متأكد من حذف هذه الحزمة؟')) {
+                wbsData.splice(index, 1);
+                renderWBSModal();
+                renderWBS();
+            }
+        }
+
+        // Old renderRTM removed - using new version defined earlier with CRUD operations
+
+        function calculateRiskLevelFunc(probability, impact) {
+            const level = probability * impact;
+            let levelLabel = 'low';
+            if (level >= 20) levelLabel = 'critical';
+            else if (level >= 12) levelLabel = 'high';
+            else if (level >= 6) levelLabel = 'medium';
+            return { level, levelLabel };
+        }
+
+        function renderRisks() {
+            const container = document.getElementById('risksContainer');
+            const critical = risksData.filter(r => r.levelLabel === 'critical').length;
+            const high = risksData.filter(r => r.levelLabel === 'high').length;
+            const medium = risksData.filter(r => r.levelLabel === 'medium').length;
+            const total = risksData.length;
+
+            document.getElementById('riskCritical').textContent = critical;
+            document.getElementById('riskHigh').textContent = high;
+            document.getElementById('riskMedium').textContent = medium;
+            document.getElementById('riskTotal').textContent = total;
+
+            container.innerHTML = risksData.map(risk => {
+                const levelClass = risk.levelLabel;
+                const levelInfo = riskLevelMap[levelClass];
+                return `
+                    <div class="risk-card bg-white p-4 rounded-lg shadow-sm border ${levelClass === 'critical' ? 'risk-level-critical' : levelClass === 'high' ? 'risk-level-high' : levelClass === 'medium' ? 'risk-level-medium' : 'risk-level-low'}">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-gray-800">${risk.id}: ${risk.name}</h4>
+                            <span class="${levelInfo.class} text-xs px-2 py-1 rounded">${levelInfo.label}</span>
+                        </div>
+                        <div class="flex gap-4 text-sm text-gray-600 mb-3">
+                            <span>الاحتمال: ${risk.probability}</span>
+                            <span>التأثير: ${risk.impact}</span>
+                            <span class="font-bold">المستوى: ${risk.level}</span>
+                        </div>
+                        <div class="bg-gray-50 p-2 rounded text-xs text-gray-700">
+                            <strong>الاستجابة:</strong> ${risk.response}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderRisksModal() {
+            const cardsView = document.getElementById('risksCardsView');
+            
+            let filteredData = risksData;
+            
+            if (currentRiskFilter !== 'all') {
+                filteredData = filteredData.filter(item => item.levelLabel === currentRiskFilter);
+            }
+            
+            if (riskSearchQuery) {
+                filteredData = filteredData.filter(item => 
+                    item.id.toLowerCase().includes(riskSearchQuery.toLowerCase()) ||
+                    item.name.toLowerCase().includes(riskSearchQuery.toLowerCase()) ||
+                    item.owner.toLowerCase().includes(riskSearchQuery.toLowerCase())
+                );
+            }
+
+            cardsView.innerHTML = filteredData.map((item, index) => {
+                const originalIndex = risksData.findIndex(r => r.id === item.id);
+                const levelInfo = riskLevelMap[item.levelLabel];
+                return `
+                    <div class="risk-card bg-white p-4 rounded-lg shadow-sm border ${item.levelLabel === 'critical' ? 'risk-level-critical' : item.levelLabel === 'high' ? 'risk-level-high' : item.levelLabel === 'medium' ? 'risk-level-medium' : 'risk-level-low'}">
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <span class="text-xs text-gray-500">${item.id}</span>
+                                <h4 class="font-bold text-gray-800">${item.name}</h4>
+                            </div>
+                            <span class="${levelInfo.class} text-xs px-2 py-1 rounded">${levelInfo.label}</span>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2 text-xs mb-3">
+                            <div class="text-center bg-gray-50 rounded p-2">
+                                <span class="text-gray-500 block">الاحتمال</span>
+                                <span class="font-bold">${item.probability}</span>
+                            </div>
+                            <div class="text-center bg-gray-50 rounded p-2">
+                                <span class="text-gray-500 block">التأثير</span>
+                                <span class="font-bold">${item.impact}</span>
+                            </div>
+                            <div class="text-center bg-gray-50 rounded p-2">
+                                <span class="text-gray-500 block">المستوى</span>
+                                <span class="font-bold">${item.level}</span>
+                            </div>
+                        </div>
+                        <div class="text-xs text-gray-600 mb-3">
+                            <span class="font-semibold">المالك:</span> ${item.owner}
+                        </div>
+                        <div class="bg-gray-50 p-2 rounded text-xs text-gray-700 mb-3">
+                            <strong>الاستجابة:</strong> ${item.response}
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="deleteRiskItem(${originalIndex})" class="flex-1 bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded text-xs transition">حذف</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            updateRiskStats();
+        }
+
+        function updateRiskStats() {
+            const critical = risksData.filter(r => r.levelLabel === 'critical').length;
+            const high = risksData.filter(r => r.levelLabel === 'high').length;
+            const medium = risksData.filter(r => r.levelLabel === 'medium').length;
+            const low = risksData.filter(r => r.levelLabel === 'low').length;
+            const total = risksData.length;
+
+            document.getElementById('riskModalCritical').textContent = critical;
+            document.getElementById('riskModalHigh').textContent = high;
+            document.getElementById('riskModalMedium').textContent = medium;
+            document.getElementById('riskModalLow').textContent = low;
+            document.getElementById('riskModalTotal').textContent = total;
+        }
+
+        function filterRisks(level) {
+            currentRiskFilter = level;
+            renderRisksModal();
+        }
+
+        function searchRisks() {
+            riskSearchQuery = document.getElementById('riskSearch').value;
+            renderRisksModal();
+        }
+
+        function calculateRiskLevel() {
+            const probability = parseInt(document.getElementById('riskProbability').value);
+            const impact = parseInt(document.getElementById('riskImpact').value);
+            const { level, levelLabel } = calculateRiskLevelFunc(probability, impact);
+            const levelInfo = riskLevelMap[levelLabel];
+            document.getElementById('riskLevelPreview').className = `risk-badge ${levelInfo.class} px-4 py-2 text-center`;
+            document.getElementById('riskLevelPreview').textContent = `${levelInfo.label} (${level})`;
+        }
+
+        function openRisksModal() {
+            document.getElementById('risksModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+            currentRiskFilter = 'all';
+            riskSearchQuery = '';
+            document.getElementById('riskSearch').value = '';
+            renderRisksModal();
+        }
+
+        function closeRisksModal(event) {
+            if (event.target === document.getElementById('risksModal')) {
+                closeRisksModalDirect();
+            }
+        }
+
+        function closeRisksModalDirect() {
+            document.getElementById('risksModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+            renderRisks();
+        }
+
+        function openAddRiskModal() {
+            document.getElementById('addRiskModal').classList.add('active');
+            const nextNum = risksData.length + 1;
+            document.getElementById('riskId').value = `R-${String(nextNum).padStart(2, '0')}`;
+            calculateRiskLevel();
+        }
+
+        function closeAddRiskModal(event) {
+            if (event.target === document.getElementById('addRiskModal')) {
+                closeAddRiskModalDirect();
+            }
+        }
+
+        function closeAddRiskModalDirect() {
+            document.getElementById('addRiskModal').classList.remove('active');
+            document.getElementById('addRiskForm').reset();
+        }
+
+        function addRiskItem(event) {
+            event.preventDefault();
+            const probability = parseInt(document.getElementById('riskProbability').value);
+            const impact = parseInt(document.getElementById('riskImpact').value);
+            const { level, levelLabel } = calculateRiskLevelFunc(probability, impact);
+            
+            risksData.push({
+                id: document.getElementById('riskId').value,
+                name: document.getElementById('riskName').value,
+                probability,
+                impact,
+                level,
+                levelLabel,
+                response: document.getElementById('riskResponse').value,
+                responseType: document.getElementById('riskResponseType').value,
+                owner: document.getElementById('riskOwner').value,
+                reviewDate: document.getElementById('riskReviewDate').value
+            });
+            closeAddRiskModalDirect();
+            renderRisksModal();
+            renderRisks();
+        }
+
+        function deleteRiskItem(index) {
+            if (confirm('هل أنت متأكد من حذف هذا الخطر؟')) {
+                risksData.splice(index, 1);
+                renderRisksModal();
+                renderRisks();
+            }
+        }
+
+        // WBS Modal Functions
+        function openWBSModal() {
+            document.getElementById('wbsModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+            renderWBSModal();
+        }
+
+        function closeWBSModal(event) {
+            if (event.target === document.getElementById('wbsModal')) {
+                closeWBSModalDirect();
+            }
+        }
+
+        function closeWBSModalDirect() {
+            document.getElementById('wbsModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+            renderWBS();
+        }
+
+        function openAddWBSModal() {
+            document.getElementById('addWBSModal').classList.add('active');
+        }
+
+        function closeAddWBSModal(event) {
+            if (event.target === document.getElementById('addWBSModal')) {
+                closeAddWBSModalDirect();
+            }
+        }
+
+        function closeAddWBSModalDirect() {
+            document.getElementById('addWBSModal').classList.remove('active');
+            document.getElementById('addWBSForm').reset();
+        }
+
+        function openEditWBSModal(index) {
+            const item = wbsData[index];
+            document.getElementById('editWBSIndex').value = index;
+            document.getElementById('editWBSName').value = item.name;
+            document.getElementById('editWBSDescription').value = item.description;
+            document.getElementById('editWBSOwner').value = item.owner;
+            document.getElementById('editWBSStatus').value = item.status;
+            document.getElementById('editWBSTasks').value = item.tasks.join(', ');
+            document.getElementById('editWBSDuration').value = item.duration;
+            document.getElementById('editWBSBudget').value = item.budget;
+            document.getElementById('editWBSModal').classList.add('active');
+        }
+
+        function closeEditWBSModal(event) {
+            if (event.target === document.getElementById('editWBSModal')) {
+                closeEditWBSModalDirect();
+            }
+        }
+
+        function closeEditWBSModalDirect() {
+            document.getElementById('editWBSModal').classList.remove('active');
+        }
+
+        function renderWBSModal() {
+            const tableBody = document.getElementById('wbsTableBody');
+            const treeView = document.getElementById('wbsTreeView');
+            
+            // Update stats
+            const totalPackages = wbsData.length;
+            const totalTasks = wbsData.reduce((sum, item) => sum + item.tasks.length, 0);
+            const completedTasks = wbsData.filter(item => item.status === 'completed').reduce((sum, item) => sum + item.tasks.length, 0);
+            const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+            
+            document.getElementById('wbsTotalPackages').textContent = totalPackages;
+            document.getElementById('wbsTotalTasks').textContent = totalTasks;
+            document.getElementById('wbsCompletedTasks').textContent = completedTasks;
+            document.getElementById('wbsCompletionRate').textContent = completionRate + '%';
+
+            // Table view
+            tableBody.innerHTML = wbsData.map((item, index) => `
+                <tr class="bg-white border-b hover:bg-gray-50 editable-item">
+                    <td class="px-4 py-3 font-medium">${index + 1}</td>
+                    <td class="px-4 py-3 font-bold text-gray-800">${item.name}</td>
+                    <td class="px-4 py-3 text-sm text-gray-600">${item.description.substring(0, 50)}...</td>
+                    <td class="px-4 py-3">${item.owner}</td>
+                    <td class="px-4 py-3"><span class="${statusMap[item.status].class} text-xs px-2 py-1 rounded">${statusMap[item.status].label}</span></td>
+                    <td class="px-4 py-3 text-center"><span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">${item.tasks.length}</span></td>
+                    <td class="px-4 py-3">
+                        <div class="flex gap-2">
+                            <button onclick="openEditWBSModal(${index})" class="edit-btn bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs transition">تعديل</button>
+                            <button onclick="deleteWBSItem(${index})" class="delete-btn bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs transition">حذف</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+
+            // Tree view
+            treeView.innerHTML = wbsData.map((item, index) => `
+                <div class="bg-gray-50 p-4 rounded-lg border-r-4 ${['border-emerald-500', 'border-blue-500', 'border-purple-500', 'border-pink-500', 'border-orange-500'][index % 5]}">
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <h4 class="font-bold text-gray-800">${item.name}</h4>
+                            <p class="text-xs text-gray-500">المالك: ${item.owner}</p>
+                        </div>
+                        <span class="${statusMap[item.status].class} text-xs px-2 py-1 rounded">${statusMap[item.status].label}</span>
+                    </div>
+                    <div class="ml-4 space-y-2">
+                        ${item.tasks.map((task, taskIndex) => `
+                            <div class="flex items-center gap-2 text-sm text-gray-700">
+                                <span class="text-emerald-600">└─</span>
+                                <span>${taskIndex + 1}. ${task}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="flex gap-2 mt-3 text-xs text-gray-600">
+                        <span>المدة: ${item.duration} يوم</span>
+                        <span>•</span>
+                        <span>الميزانية: ${item.budget.toLocaleString()} ر.س</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function addWBSItem(event) {
+            event.preventDefault();
+            
+            const newId = 'WBS-' + (wbsData.length + 1);
+            const tasks = document.getElementById('wbsTasks').value.split(',').map(t => t.trim()).filter(t => t);
+            
+            wbsData.push({
+                id: newId,
+                name: document.getElementById('wbsName').value,
+                description: document.getElementById('wbsDescription').value,
+                owner: document.getElementById('wbsOwner').value,
+                status: document.getElementById('wbsStatus').value,
+                duration: parseInt(document.getElementById('wbsDuration').value),
+                budget: parseInt(document.getElementById('wbsBudget').value) || 0,
+                tasks: tasks.length > 0 ? tasks : ['المهمة الرئيسية']
+            });
+            
+            closeAddWBSModalDirect();
+            renderWBSModal();
+            renderWBS();
+        }
+
+        function saveEditWBS(event) {
+            event.preventDefault();
+            
+            const index = parseInt(document.getElementById('editWBSIndex').value);
+            const tasks = document.getElementById('editWBSTasks').value.split(',').map(t => t.trim()).filter(t => t);
+            
+            wbsData[index] = {
+                id: wbsData[index].id,
+                name: document.getElementById('editWBSName').value,
+                description: document.getElementById('editWBSDescription').value,
+                owner: document.getElementById('editWBSOwner').value,
+                status: document.getElementById('editWBSStatus').value,
+                duration: parseInt(document.getElementById('editWBSDuration').value),
+                budget: parseInt(document.getElementById('editWBSBudget').value) || 0,
+                tasks: tasks.length > 0 ? tasks : ['المهمة الرئيسية']
+            };
+            
+            closeEditWBSModalDirect();
+            renderWBSModal();
+            renderWBS();
+        }
+
+        function deleteWBSItem(index) {
+            if (confirm('هل أنت متأكد من حذف هذه الحزمة؟')) {
+                wbsData.splice(index, 1);
+                renderWBSModal();
+                renderWBS();
+            }
+        }
+
+        // Modal Functions (RTM, Estimation, Stakeholder, Planning)
+
+        function openRTMModal() {
+            document.getElementById('rtmModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+            renderRTMModal();
+        }
+        function closeRTMModal(event) { if (event.target === document.getElementById('rtmModal')) closeRTMModalDirect(); }
+        function closeRTMModalDirect() { document.getElementById('rtmModal').classList.remove('active'); document.body.style.overflow = 'auto'; renderRTM(); }
+
+        function renderRTMModal() {
+            const tableBody = document.getElementById('rtmTableBody');
+            const cardsView = document.getElementById('rtmCardsView');
+            const searchQuery = (document.getElementById('rtmSearch').value || '').toLowerCase();
+            const statusFilter = document.getElementById('rtmStatusFilter').value || '';
+            const priorityFilter = document.getElementById('rtmPriorityFilter').value || '';
+
+            let filteredData = rtmData.filter(item => {
+                const matchesSearch = item.id.toLowerCase().includes(searchQuery) || 
+                                     item.name.toLowerCase().includes(searchQuery) ||
+                                     item.description.toLowerCase().includes(searchQuery) ||
+                                     item.owner.toLowerCase().includes(searchQuery);
+                const matchesStatus = !statusFilter || item.status === statusFilter;
+                const matchesPriority = !priorityFilter || item.priority === priorityFilter;
+                return matchesSearch && matchesStatus && matchesPriority;
+            });
+
+            // Update stats
+            const totalCount = rtmData.length;
+            const completedCount = rtmData.filter(r => r.status === 'completed').length;
+            const inProgressCount = rtmData.filter(r => r.status === 'in-progress').length;
+            const pendingCount = rtmData.filter(r => r.status === 'pending').length;
+            const highPriorityCount = rtmData.filter(r => r.priority === 'high').length;
+
+            document.getElementById('rtmTotalCount').textContent = totalCount;
+            document.getElementById('rtmCompletedCount').textContent = completedCount;
+            document.getElementById('rtmInProgressCount').textContent = inProgressCount;
+            document.getElementById('rtmPendingCount').textContent = pendingCount;
+            document.getElementById('rtmHighPriorityCount').textContent = highPriorityCount;
+
+            // Priority colors
+            const priorityColors = {
+                high: 'bg-red-100 text-red-800',
+                medium: 'bg-yellow-100 text-yellow-800',
+                low: 'bg-green-100 text-green-800'
+            };
+
+            const statusColors = {
+                pending: { label: 'قيد الانتظار', class: 'bg-yellow-100 text-yellow-800' },
+                'in-progress': { label: 'جاري التنفيذ', class: 'bg-blue-100 text-blue-800' },
+                completed: { label: 'مكتملة', class: 'bg-green-100 text-green-800' }
+            };
+
+            // Table view
+            tableBody.innerHTML = filteredData.map((item, index) => {
+                const originalIndex = rtmData.findIndex(r => r.id === item.id);
+                return `
+                    <tr class="bg-white border-b hover:bg-gray-50">
+                        <td class="px-4 py-3 font-medium">${rtmData.indexOf(item) + 1}</td>
+                        <td class="px-4 py-3 font-bold text-gray-800">${item.name}</td>
+                        <td class="px-4 py-3 text-sm text-gray-600">${item.description.substring(0, 40)}...</td>
+                        <td class="px-4 py-3"><span class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded">${item.wbsLink}</span></td>
+                        <td class="px-4 py-3"><span class="${priorityColors[item.priority]} text-xs font-medium px-2.5 py-0.5 rounded">${item.priority === 'high' ? '🔴 عالية' : item.priority === 'medium' ? '🟡 متوسطة' : '🟢 منخفضة'}</span></td>
+                        <td class="px-4 py-3"><span class="${statusColors[item.status].class} text-xs font-medium px-2.5 py-0.5 rounded">${statusColors[item.status].label}</span></td>
+                        <td class="px-4 py-3">
+                            <div class="flex gap-2">
+                                <button onclick="openEditRTMModal(${originalIndex})" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs transition">تعديل</button>
+                                <button onclick="deleteRTMItem(${originalIndex})" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs transition">حذف</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            // Cards view
+            cardsView.innerHTML = filteredData.map((item, index) => {
+                const originalIndex = rtmData.findIndex(r => r.id === item.id);
+                const statusInfo = statusColors[item.status];
+                const priorityColor = item.priority === 'high' ? 'border-red-500' : item.priority === 'medium' ? 'border-yellow-500' : 'border-green-500';
+                
+                return `
+                    <div class="bg-white p-4 rounded-lg shadow border-r-4 ${priorityColor}">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <span class="text-xs text-gray-500">${item.id}</span>
+                                <h4 class="font-bold text-gray-800">${item.name}</h4>
+                            </div>
+                            <span class="${statusInfo.class} text-xs px-2 py-1 rounded">${statusInfo.label}</span>
+                        </div>
+                        <p class="text-xs text-gray-600 mb-3">${item.description}</p>
+                        <div class="grid grid-cols-2 gap-2 text-xs mb-3">
+                            <div class="bg-gray-50 p-2 rounded">
+                                <span class="text-gray-500 block">الأولوية</span>
+                                <span class="font-bold">${item.priority === 'high' ? '🔴 عالية' : item.priority === 'medium' ? '🟡 متوسطة' : '🟢 منخفضة'}</span>
+                            </div>
+                            <div class="bg-gray-50 p-2 rounded">
+                                <span class="text-gray-500 block">الربط</span>
+                                <span class="font-bold text-purple-600">${item.wbsLink}</span>
+                            </div>
+                        </div>
+                        <div class="text-xs text-gray-600 mb-3">
+                            <strong>المالك:</strong> ${item.owner}
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="openEditRTMModal(${originalIndex})" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded text-xs transition">تعديل</button>
+                            <button onclick="deleteRTMItem(${originalIndex})" class="flex-1 bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-xs transition">حذف</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function openAddRTMModal() {
+            document.getElementById('addRTMModal').classList.add('active');
+            const nextNum = rtmData.length + 1;
+            document.getElementById('rtmId').value = `RQ-${String(nextNum).padStart(2, '0')}`;
+        }
+
+        function closeAddRTMModal(event) {
+            if (event.target === document.getElementById('addRTMModal')) {
+                closeAddRTMModalDirect();
+            }
+        }
+
+        function closeAddRTMModalDirect() {
+            document.getElementById('addRTMModal').classList.remove('active');
+            document.getElementById('addRTMForm').reset();
+        }
+
+        function addRTMItem(event) {
+            event.preventDefault();
+            
+            rtmData.push({
+                id: document.getElementById('rtmId').value,
+                name: document.getElementById('rtmName').value,
+                description: document.getElementById('rtmDescription').value,
+                wbsLink: document.getElementById('rtmWBSLink').value,
+                priority: document.getElementById('rtmPriority').value,
+                status: document.getElementById('rtmStatus').value,
+                owner: document.getElementById('rtmOwner').value,
+                startDate: document.getElementById('rtmStartDate').value,
+                endDate: document.getElementById('rtmEndDate').value
+            });
+            
+            closeAddRTMModalDirect();
+            renderRTMModal();
+            renderRTM();
+        }
+
+        function openEditRTMModal(index) {
+            const item = rtmData[index];
+            document.getElementById('editRTMIndex').value = index;
+            document.getElementById('editRTMId').value = item.id;
+            document.getElementById('editRTMName').value = item.name;
+            document.getElementById('editRTMDescription').value = item.description;
+            document.getElementById('editRTMWBSLink').value = item.wbsLink;
+            document.getElementById('editRTMPriority').value = item.priority;
+            document.getElementById('editRTMStatus').value = item.status;
+            document.getElementById('editRTMOwner').value = item.owner;
+            document.getElementById('editRTMStartDate').value = item.startDate || '';
+            document.getElementById('editRTMEndDate').value = item.endDate || '';
+            document.getElementById('editRTMModal').classList.add('active');
+        }
+
+        function closeEditRTMModal(event) {
+            if (event.target === document.getElementById('editRTMModal')) {
+                closeEditRTMModalDirect();
+            }
+        }
+
+        function closeEditRTMModalDirect() {
+            document.getElementById('editRTMModal').classList.remove('active');
+        }
+
+        function saveEditRTM(event) {
+            event.preventDefault();
+            
+            const index = parseInt(document.getElementById('editRTMIndex').value);
+            rtmData[index] = {
+                id: rtmData[index].id,
+                name: document.getElementById('editRTMName').value,
+                description: document.getElementById('editRTMDescription').value,
+                wbsLink: document.getElementById('editRTMWBSLink').value,
+                priority: document.getElementById('editRTMPriority').value,
+                status: document.getElementById('editRTMStatus').value,
+                owner: document.getElementById('editRTMOwner').value,
+                startDate: document.getElementById('editRTMStartDate').value,
+                endDate: document.getElementById('editRTMEndDate').value
+            };
+            
+            closeEditRTMModalDirect();
+            renderRTMModal();
+            renderRTM();
+        }
+
+        function deleteRTMItem(index) {
+            if (confirm('هل أنت متأكد من حذف هذا المتطلب؟')) {
+                rtmData.splice(index, 1);
+                renderRTMModal();
+                renderRTM();
+            }
+        }
+
+        function renderRTM() {
+            const tbody = document.getElementById('rtmBody');
+            if (!tbody) return;
+            
+            const statusMap = {
+                pending: { label: 'قيد الانتظار', class: 'bg-yellow-100 text-yellow-800' },
+                'in-progress': { label: 'جاري التنفيذ', class: 'bg-blue-100 text-blue-800' },
+                completed: { label: 'مكتملة', class: 'bg-green-100 text-green-800' }
+            };
+            tbody.innerHTML = rtmData.map(item => `
+                <tr class="bg-white border-b hover:bg-gray-50">
+                    <td class="px-6 py-4 font-medium text-gray-900">${item.id}</td>
+                    <td class="px-6 py-4">${item.name}</td>
+                    <td class="px-6 py-4 text-sm text-gray-600">${item.description}</td>
+                    <td class="px-6 py-4">${item.owner}</td>
+                    <td class="px-6 py-4"><span class="${statusMap[item.status].class} text-xs font-medium px-2.5 py-0.5 rounded">✔️ ${statusMap[item.status].label}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        function openEstimationModal() {
+            document.getElementById('estimationModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeEstimationModal(event) { if (event.target === document.getElementById('estimationModal')) closeEstimationModalDirect(); }
+        function closeEstimationModalDirect() { document.getElementById('estimationModal').classList.remove('active'); document.body.style.overflow = 'auto'; }
+
+        function openStakeholderModal() {
+            document.getElementById('stakeholderModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeStakeholderModal(event) { if (event.target === document.getElementById('stakeholderModal')) closeStakeholderModalDirect(); }
+        function closeStakeholderModalDirect() { document.getElementById('stakeholderModal').classList.remove('active'); document.body.style.overflow = 'auto'; }
+
+        function openPlanningModal() {
+            document.getElementById('planningModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        function closePlanningModal(event) { if (event.target === document.getElementById('planningModal')) closePlanningModalDirect(); }
+        function closePlanningModalDirect() { document.getElementById('planningModal').classList.remove('active'); document.body.style.overflow = 'auto'; }
+
+        // Close modals with Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeRisksModalDirect();
+                closeWBSModalDirect();
+                closeAddWBSModalDirect();
+                closeEditWBSModalDirect();
+                closeRTMModalDirect();
+                closeEstimationModalDirect();
+                closeStakeholderModalDirect();
+                closePlanningModalDirect();
+                closeAddRiskModalDirect();
+            }
+        });
+
+        // Comprehensive KPI Calculation Function
+        function updateAllKPIs() {
+            // WBS KPIs
+            const totalTasks = wbsData.reduce((sum, item) => sum + item.tasks.length, 0);
+            const completedTasks = wbsData.filter(item => item.status === 'completed').reduce((sum, item) => sum + item.tasks.length, 0);
+            const completedWBS = wbsData.filter(item => item.status === 'completed').length;
+            const totalBudget = wbsData.reduce((sum, item) => sum + item.budget, 0);
+            const completionRate = totalTasks > 0 ? (completedTasks / totalTasks * 100).toFixed(0) : 0;
+            const budgetUsed = totalBudget > 0 ? 97 : 0; // Placeholder
+            const wbsHealth = completionRate >= 80 ? '🟢 ممتاز' : completionRate >= 60 ? '🟡 جيد' : '🔴 متأخر';
+
+            if (document.getElementById('wbsKpiCompletionRate')) {
+                document.getElementById('wbsKpiCompletionRate').textContent = completionRate + '%';
+                document.getElementById('wbsKpiBudgetUsed').textContent = budgetUsed + '%';
+                document.getElementById('wbsKpiCompletedTasks').textContent = completedTasks + '/' + totalTasks;
+                document.getElementById('wbsKpiHealth').textContent = wbsHealth;
+            }
+
+            // RTM KPIs
+            const totalRequirements = rtmData.length;
+            const completedRequirements = rtmData.filter(r => r.status === 'completed').length;
+            const rtmCompletionRate = totalRequirements > 0 ? (completedRequirements / totalRequirements * 100).toFixed(0) : 0;
+            const highPriorityCount = rtmData.filter(r => r.priority === 'high').length;
+            const pendingCount = rtmData.filter(r => r.status === 'pending').length;
+            const trackingRate = totalRequirements > 0 ? ((totalRequirements - pendingCount) / totalRequirements * 100).toFixed(0) : 0;
+
+            if (document.getElementById('rtmKpiCompletionRate')) {
+                document.getElementById('rtmKpiCompletionRate').textContent = rtmCompletionRate + '%';
+                document.getElementById('rtmKpiHighPriority').textContent = highPriorityCount;
+                document.getElementById('rtmKpiPending').textContent = pendingCount;
+                document.getElementById('rtmKpiTrackingRate').textContent = trackingRate + '%';
+            }
+
+            // Risk KPIs
+            const totalRisks = risksData.length;
+            const criticalRisks = risksData.filter(r => r.levelLabel === 'critical').length;
+            const highRisks = risksData.filter(r => r.levelLabel === 'high').length;
+            const mediumRisks = risksData.filter(r => r.levelLabel === 'medium').length;
+            const riskIndex = totalRisks > 0 ? (((criticalRisks * 3 + highRisks * 2 + mediumRisks * 1) / totalRisks / 3) * 100).toFixed(0) : 0;
+            const mitigationRate = totalRisks > 0 ? ((risksData.filter(r => r.responseType === 'mitigate').length / totalRisks) * 100).toFixed(0) : 0;
+
+            if (document.getElementById('riskKpiIndex')) {
+                document.getElementById('riskKpiIndex').textContent = riskIndex + '/100';
+                document.getElementById('riskKpiHigh').textContent = highRisks + criticalRisks;
+                document.getElementById('riskKpiMedium').textContent = mediumRisks;
+                document.getElementById('riskKpiMitigation').textContent = mitigationRate + '%';
+            }
+
+            // Domains/Overall Health
+            if (document.getElementById('domainsKpiOverallHealth')) {
+                const scheduleHealth = 90; // 90% - Slightly behind
+                const budgetHealth = 97;   // 97% - Within budget
+                const qualityHealth = 95;  // 95% - Good quality
+                const averageHealth = (scheduleHealth + budgetHealth + qualityHealth) / 3;
+                
+                let overallStatus = '🟢 ممتاز';
+                if (averageHealth < 80) overallStatus = '🔴 حرج';
+                else if (averageHealth < 90) overallStatus = '🟡 محاطر';
+                else if (averageHealth < 95) overallStatus = '🟡 متوازن مع مراقبة';
+                else overallStatus = '🟢 ممتاز';
+
+                document.getElementById('domainsKpiOverallHealth').textContent = overallStatus.split(' ')[0];
+                document.getElementById('domainsKpiHealthDesc').textContent = overallStatus.split(' ').slice(1).join(' ');
+            }
+        }
+
+        // Call updateAllKPIs immediately and on data changes
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(updateAllKPIs, 500);
+        });
+
+        // Update KPIs whenever data changes (override modal close functions)
+        const originalCloseRTMModal = closeRTMModalDirect;
+        closeRTMModalDirect = function() {
+            originalCloseRTMModal();
+            updateAllKPIs();
+        };
+    </script>
+
+</body>
+</html>
